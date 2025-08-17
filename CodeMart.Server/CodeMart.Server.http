@@ -1,0 +1,6 @@
+@CodeMart.Server_HostAddress = http://localhost:5118
+
+GET {{CodeMart.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

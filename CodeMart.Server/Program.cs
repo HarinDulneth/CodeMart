@@ -1,6 +1,20 @@
+
+
+using Supabase;
+
 var builder = WebApplication.CreateBuilder(args);
+var url = builder.Configuration["Supabase:ProjectUrl"]!;
+var key = builder.Configuration["Authentication:SupabaseApiKey"]!;
+
+var options = new SupabaseOptions
+{
+    AutoRefreshToken = true,
+    AutoConnectRealtime = true,
+};
 
 // Add services to the container.
+
+builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -36,6 +36,12 @@ namespace CodeMart.Server.Models
         [Required]
         public List<string> ImageUrls { get; set; } = new List<string>();
 
+        [Required]
+        public string PrimaryLanguage { get; set; }
+
+        [Required]
+        public List<string>? SecondaryLanguages { get; set; } = new List<string>();
+
         public int OwnerId { get; set; }
         [ForeignKey("OwnerId")]
         public required User Owner { get; set; }

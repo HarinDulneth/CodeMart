@@ -13,9 +13,6 @@ namespace CodeMart.Server.Models
         public int Id { get; set; }
 
         [Required]
-        public PaymentMethod PaymentMethod { get; set; }
-
-        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
@@ -33,6 +30,6 @@ namespace CodeMart.Server.Models
         [InverseProperty("Order")]
         public Transaction Transaction { get; set; }
 
-        public bool isCompleted { get; set; } = false;
+        public bool IsCompleted { get; set; } = false;
     }
 }

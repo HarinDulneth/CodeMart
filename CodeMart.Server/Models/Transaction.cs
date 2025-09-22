@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeMart.Server.Models
 {
+    [Table("transactions", Schema = "public")]
     public class Transaction
     {
         public int Id { get; set; }
@@ -25,6 +26,6 @@ namespace CodeMart.Server.Models
         public decimal Amount { get; set; }
 
         [Required]
-        public string Status { get; set; }
+        public TransactionStatus Status { get; set; }
     }
 }

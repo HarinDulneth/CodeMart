@@ -6,10 +6,10 @@ namespace CodeMart.Server.Interfaces
     public interface IProjectService
     {
         Task<List<Project>> GetAllProjectsAsync();
-        Task<Project> GetProjectByIdAsync(int id);
+        Task<Project?> GetProjectByIdAsync(int id);
         Task<List<Project>> GetProjectsMoreThanRatingAsync(int rating);
         Task<List<Project>> GetProjectsForGivenCategoryAsync(Category category);
-        Task<List<Project>> GetProjectsBetweenPriceAsync(decimal price1, decimal price2);
+        Task<List<Project>> GetProjectsBetweenPriceAsync(decimal LowPrice, decimal HighPrice);
         Task<List<User>> GetBuyersAsync(int projectId);
         Task<List<Review>> GetReviewesAsync(int projectId);
         Task<List<Project>> GetProjectByPermissionAsync(Permissions permission);
@@ -20,7 +20,6 @@ namespace CodeMart.Server.Interfaces
         Task<bool> RejectProjectAsync(int projectId);
         Task<List<Project>> SearchProjectAsync(string name);
         Task<List<Project>> GetProjectsSortedByPriceAsync(bool ascending = true);
-        Task<decimal> CalculateAverageRatingAsync(int projectId);
         Task<bool> HasUserPurchasedProjectAsync(int userId, int projectId);
         Task<bool> IsProjectOwnedByUserAsync(int userId, int projectId);
         Task<Decimal> GetTotalRevenueForProjectAsync(int projectId);

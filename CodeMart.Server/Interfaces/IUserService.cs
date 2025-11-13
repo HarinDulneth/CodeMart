@@ -9,7 +9,7 @@ namespace CodeMart.Server.Interfaces
         Task<User?> GetUserByEmailAsync(string email);
         Task<List<User>> GetAllUsersAsync();
         Task<User?> CreateUserAsync(User user);
-        Task<User?> UpdateUserAsync(User user);
+        Task<User?> UpdateUserAsync(int id, User user);
         Task<bool> DeleteUserAsync(int id);
         Task<bool> AddProjectToWishlistAsync(int userId, int projectId);
         Task<bool> RemoveProjectFromWishlistAsync(int userId, int projectId);

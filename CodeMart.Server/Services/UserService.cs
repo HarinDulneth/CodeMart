@@ -12,23 +12,17 @@ namespace CodeMart.Server.Services
         private readonly AppDbContext _context;
         private readonly ILogger<UserService> _logger;
 
+        public UserService(AppDbContext context, ILogger<UserService> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
+
         public async Task<User?> GetUserByIdAsync(int id)
         {
             try
             {
-                return await _context.Users
-                    .Select(u => new User
-                    {
-                        Id = u.Id,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Email = u.Email,
-                        Occupation = u.Occupation,
-                        CompanyName = u.CompanyName,
-                        ProfilePicture = u.ProfilePicture,
-                        IsAdmin = u.IsAdmin
-                    })
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
             }
             catch (Exception ex)
             {
@@ -41,19 +35,7 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                return await _context.Users
-                    .Select(u => new User
-                    {
-                        Id = u.Id,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Email = u.Email,
-                        Occupation = u.Occupation,
-                        CompanyName = u.CompanyName,
-                        ProfilePicture = u.ProfilePicture,
-                        IsAdmin = u.IsAdmin
-                    })
-                    .FirstOrDefaultAsync(u => u.Email == email);
+                return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             }
             catch (Exception ex)
             {
@@ -62,46 +44,11 @@ namespace CodeMart.Server.Services
             }
         }
 
-        public async Task<List<Project>> GetSellingProjectsAsync(int userId)
-        {
-           try{
-                var user = await _context.Users
-                .Include(u => u.SellingProjects)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-                if (user == null)
-                {
-                    _logger.LogWarning("User with ID {UserId} not found", userId);
-                    return new List<Project>();
-                }
-
-                return user?.SellingProjects;
-           }  
-           catch (Exception ex)
-           {
-                _logger.LogError(ex, "cant get selling projects");
-                throw;
-           }
-            
-        }
-
         public async Task<List<User>> GetAllUsersAsync()
         {
             try
             {
-                return await _context.Users
-                    .Select(u => new User
-                    {
-                        Id = u.Id,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Email = u.Email,
-                        Occupation = u.Occupation,
-                        CompanyName = u.CompanyName,
-                        ProfilePicture = u.ProfilePicture,
-                        IsAdmin = u.IsAdmin
-                    })
-                    .ToListAsync();
+                return await _context.Users.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -126,15 +73,15 @@ namespace CodeMart.Server.Services
             }
         }
 
-        public async Task<User?> UpdateUserAsync(User user)
+        public async Task<User?> UpdateUserAsync(int id, User user)
         {
             try
             {
-                var existingUser = await _context.Users.FindAsync(user.Id);
+                var existingUser = await _context.Users.FindAsync(id);
 
                 if (existingUser == null)
                 {
-                    _logger.LogWarning("User with ID {UserId} not found for update", user.Id);
+                    _logger.LogWarning("User with ID {UserId} not found for update", id);
                     return null; 
                 }
 
@@ -165,7 +112,7 @@ namespace CodeMart.Server.Services
                 if (user == null)
                 {
                     _logger.LogWarning("User with ID {UserId} not found for deletion", id);
-                    return false;
+                    throw new Exception("User not found");
                 }
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
@@ -176,6 +123,30 @@ namespace CodeMart.Server.Services
                 _logger.LogError(ex, "Error deleting user {UserId}", id);
                 throw;
             }
+        }
+
+        public async Task<List<Project>> GetSellingProjectsAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                .Include(u => u.SellingProjects)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return new List<Project>();
+                }
+
+                return user?.SellingProjects;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "cant get selling projects");
+                throw;
+            }
+
         }
 
         public async Task<bool> AddProjectToWishlistAsync(int userId, int projectId)

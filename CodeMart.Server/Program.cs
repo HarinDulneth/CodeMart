@@ -1,6 +1,11 @@
-
-
+using CodeMart.Server.Data;
+using CodeMart.Server.Interfaces;
+using CodeMart.Server.Services;
+using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
 using Supabase;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 var url = builder.Configuration["Supabase:ProjectUrl"]!;
@@ -12,10 +17,24 @@ var options = new SupabaseOptions
     AutoConnectRealtime = true,
 };
 
-// Add services to the container.
-
+// Add Supabase Client
 builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
 
+// Add Entity Framework Core with PostgreSQL
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+IServiceCollection serviceCollection = builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Register Services
+builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IProjectService, ProjectService>();
+//builder.Services.AddScoped<ITransactionService, TransactionService>();
+//builder.Services.AddScoped<IOrderService, OrderService>();
+//builder.Services.AddScoped<IReviewService, ReviewService>();
+
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -29,6 +48,18 @@ app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

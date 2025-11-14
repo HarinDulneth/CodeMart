@@ -43,20 +43,20 @@ namespace CodeMart.CodeMart.Server.Models
 
         public string? ProfilePicture { get; set; }
 
-    //    [InverseProperty("Owner")]
-    //    public List<Project> SellingProjects { get; set; } = [];
+        [InverseProperty("Owner")]
+        public List<Project> SellingProjects { get; set; } = [];
 
-    //    [InverseProperty("Buyers")]
-    //    public List<Project> BoughtProjects { get; set; } = [];
-        
-    //    [InverseProperty("WishlistedBy")]
-    //    public List<Project> WishlistedProjects { get; set; } = [];
+        [InverseProperty("Buyers")]
+        public List<Project> BoughtProjects { get; set; } = [];
 
-    //    [InverseProperty("Reviewer")]
-    //    public List<Review> Reviews { get; set; } = [];
+        [InverseProperty("WishlistedBy")]
+        public List<Project> WishlistedProjects { get; set; } = [];
 
-    //    [InverseProperty("Buyer")]
-    //    public List<Order> Orders { get; set; } = [];
+        [InverseProperty("Reviewer")]
+        public List<Review> Reviews { get; set; } = [];
+
+        [InverseProperty("Buyer")]
+        public List<Order> Orders { get; set; } = [];
 
     }
 }

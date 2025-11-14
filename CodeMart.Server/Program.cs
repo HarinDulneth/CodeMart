@@ -29,10 +29,10 @@ IServiceCollection serviceCollection = builder.Services.AddDbContext<AppDbContex
 
 // Register Services
 builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IProjectService, ProjectService>();
-//builder.Services.AddScoped<ITransactionService, TransactionService>();
-//builder.Services.AddScoped<IOrderService, OrderService>();
-//builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // Add services to the container.
 builder.Services.AddControllers();

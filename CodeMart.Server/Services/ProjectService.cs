@@ -1,362 +1,362 @@
-﻿//using CodeMart.CodeMart.Server.Models;
-//using CodeMart.Server.Data;
-//using CodeMart.Server.Interfaces;
-//using CodeMart.Server.Models;
-//using Microsoft.AspNetCore.Mvc.ViewEngines;
-//using Microsoft.EntityFrameworkCore;
+﻿using CodeMart.CodeMart.Server.Models;
+using CodeMart.Server.Data;
+using CodeMart.Server.Interfaces;
+using CodeMart.Server.Models;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.EntityFrameworkCore;
 
-//namespace CodeMart.Server.Services
-//{
-//    public class ProjectService : IProjectService
-//    {
-//        private readonly AppDbContext _context;
-//        private readonly ILogger<ProjectService> _logger;
+namespace CodeMart.Server.Services
+{
+    public class ProjectService : IProjectService
+    {
+        private readonly AppDbContext _context;
+        private readonly ILogger<ProjectService> _logger;
 
-//        public ProjectService(AppDbContext context, ILogger<ProjectService> logger)
-//        {
-//            _context = context;
-//            _logger = logger;
-//        }
+        public ProjectService(AppDbContext context, ILogger<ProjectService> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
 
-//        public async Task<Project?> GetProjectByIdAsync(int id)
-//        {
-//            try
-//            {
-//                return await _context.Projects.FindAsync(id);
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting Project {Id}", id);
-//                throw;
-//            }
-//        }
+        public async Task<Project?> GetProjectByIdAsync(int id)
+        {
+            try
+            {
+                return await _context.Projects.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Project {Id}", id);
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> GetAllProjectsAsync() 
-//        {
-//            try
-//            {
-//                return await _context.Projects.ToListAsync();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting all the Projects");
-//                throw;
-//            }
-//        }
+        public async Task<List<Project>> GetAllProjectsAsync()
+        {
+            try
+            {
+                return await _context.Projects.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all the Projects");
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> GetProjectsMoreThanRatingAsync(int rating)
-//        {
-//            try
-//            {
-//                var Projects = await _context.Projects
-//                    .Include(p => p.Review)
-//                    .Where(p => p.Review.Any() && p.Review.Average(r => r.Rating) > rating)
-//                    .ToListAsync();
-//                return Projects;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting all the Projects more than rating {rating}", rating);
-//                throw;
-//            }
-//        }
+        public async Task<List<Project>> GetProjectsMoreThanRatingAsync(int rating)
+        {
+            try
+            {
+                var Projects = await _context.Projects
+                    .Include(p => p.Review)
+                    .Where(p => p.Review.Any() && p.Review.Average(r => r.Rating) > rating)
+                    .ToListAsync();
+                return Projects;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all the Projects more than rating {rating}", rating);
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> GetProjectsForGivenCategoryAsync(Category category)
-//        {
-//            try
-//            {
-//                return await _context.Projects
-//                    .Where(p => p.Category == category)
-//                    .ToListAsync();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting Projects more than category {cat}", category);
-//                throw;
-//            }
-//        }
+        public async Task<List<Project>> GetProjectsForGivenCategoryAsync(Category category)
+        {
+            try
+            {
+                return await _context.Projects
+                    .Where(p => p.Category == category)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Projects more than category {cat}", category);
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> GetProjectsBetweenPriceAsync(decimal LowPrice, decimal HighPrice)
-//        {
-//            try
-//            {
-//                return await _context.Projects
-//                .Where(p => p.Price >= LowPrice && p.Price <= HighPrice)
-//                .ToListAsync();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting Projects between prices {price1} {price2}", LowPrice, HighPrice);
-//                throw;
-//            }
-           
-//        }
+        public async Task<List<Project>> GetProjectsBetweenPriceAsync(decimal LowPrice, decimal HighPrice)
+        {
+            try
+            {
+                return await _context.Projects
+                .Where(p => p.Price >= LowPrice && p.Price <= HighPrice)
+                .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Projects between prices {price1} {price2}", LowPrice, HighPrice);
+                throw;
+            }
 
-//        public async Task<List<User>> GetBuyersAsync(int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects
-//                .Include(p => p.Buyers)
-//                .FirstOrDefaultAsync(p => p.Id == projectId);
+        }
 
-//                return project?.Buyers ?? new List<User>();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting buyers of project {id}", projectId);
-//                throw;
-//            }
+        public async Task<List<User>> GetBuyersAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                .Include(p => p.Buyers)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                return project?.Buyers ?? new List<User>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting buyers of project {id}", projectId);
+                throw;
+            }
 
 
-//        }
+        }
 
-//        public async Task<List<Review>> GetReviewesAsync(int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects
-//                .Include(p => p.Review)
-//                .FirstOrDefaultAsync(p => p.Id == projectId);
+        public async Task<List<Review>> GetReviewesAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                .Include(p => p.Review)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
 
-//                return project?.Review ?? new List<Review>();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting reviews of project {id}", projectId);
-//                throw;
-//            }
-//        }
+                return project?.Review ?? new List<Review>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting reviews of project {id}", projectId);
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> GetProjectByPermissionAsync(Permissions permission)
-//        {
-//            try
-//            {
-//                return await _context.Projects
-//                    .Where(p => p.Permission == permission)
-//                    .ToListAsync();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting Projects more than permission {cat}", permission);
-//                throw;
-//            }
-//        }
+        public async Task<List<Project>> GetProjectByPermissionAsync(Permissions permission)
+        {
+            try
+            {
+                return await _context.Projects
+                    .Where(p => p.Permission == permission)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Projects more than permission {cat}", permission);
+                throw;
+            }
+        }
 
-//        public async Task<Project?> CreateProjectAsync(Project project)
-//        {
-//            try
-//            {
-//                _context.Projects.Add(project);
-//                await _context.SaveChangesAsync();
-//                return project;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error creating Project");
-//                throw;
-//            }
-//        }
+        public async Task<Project?> CreateProjectAsync(Project project)
+        {
+            try
+            {
+                _context.Projects.Add(project);
+                await _context.SaveChangesAsync();
+                return project;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating Project");
+                throw;
+            }
+        }
 
-//        public async Task<Project?> UpdateProjectAsync(Project project)
-//        {
-//            try
-//            {
-//                var existingProject = await _context.Projects.FindAsync(project.Id);
-//                if (existingProject == null)
-//                {
-//                    _logger.LogError("Cannot find project with id {ProjectId} for update", project.Id);
-//                    return null;
-//                }
+        public async Task<Project?> UpdateProjectAsync(Project project)
+        {
+            try
+            {
+                var existingProject = await _context.Projects.FindAsync(project.Id);
+                if (existingProject == null)
+                {
+                    _logger.LogError("Cannot find project with id {ProjectId} for update", project.Id);
+                    return null;
+                }
 
-//                // Update fields
-//                existingProject.Name = project.Name;
-//                existingProject.Category = project.Category;
-//                existingProject.Description = project.Description;
-//                existingProject.Price = project.Price;
-//                existingProject.ProjectUrl = project.ProjectUrl;
-//                existingProject.VideoUrl = project.VideoUrl;
-//                existingProject.UploadDate = project.UploadDate;
-//                existingProject.Permission = project.Permission;
-//                existingProject.ImageUrls = project.ImageUrls;
-//                existingProject.OwnerId = project.OwnerId;
+                // Update fields
+                existingProject.Name = project.Name;
+                existingProject.Category = project.Category;
+                existingProject.Description = project.Description;
+                existingProject.Price = project.Price;
+                existingProject.ProjectUrl = project.ProjectUrl;
+                existingProject.VideoUrl = project.VideoUrl;
+                existingProject.UploadDate = project.UploadDate;
+                existingProject.Permission = project.Permission;
+                existingProject.ImageUrls = project.ImageUrls;
+                existingProject.OwnerId = project.OwnerId;
 
-//                await _context.SaveChangesAsync();
-//                return existingProject;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error updating project {ProjectId}", project.Id);
-//                throw;
-//            }
-//        }
+                await _context.SaveChangesAsync();
+                return existingProject;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating project {ProjectId}", project.Id);
+                throw;
+            }
+        }
 
-//        public async Task<bool> DeleteProjectAsync(int id)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects.FindAsync(id);
-//                if (project == null)
-//                {
-//                    _logger.LogError("Cant find project with id {id} for delete", id);
-//                    return false;
-//                }
-//                _context.Projects.Remove(project);
-//                await _context.SaveChangesAsync();
-//                return true;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error deleting project {id}", id);
-//                throw;
-//            }
-//        }
+        public async Task<bool> DeleteProjectAsync(int id)
+        {
+            try
+            {
+                var project = await _context.Projects.FindAsync(id);
+                if (project == null)
+                {
+                    _logger.LogError("Cant find project with id {id} for delete", id);
+                    return false;
+                }
+                _context.Projects.Remove(project);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting project {id}", id);
+                throw;
+            }
+        }
 
-//        public async Task<bool> ApproveProjectAsync(int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects.FindAsync(projectId);
-//                if (project == null)
-//                {
-//                    _logger.LogError("Cant find project with id {id} for approval", projectId);
-//                    return false;
-//                }
-//                project.Permission = Permissions.Approved;
-//                await _context.SaveChangesAsync();
-//                return true;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error approving project {id}", projectId);
-//                throw;
-//            }
-//        }
+        public async Task<bool> ApproveProjectAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects.FindAsync(projectId);
+                if (project == null)
+                {
+                    _logger.LogError("Cant find project with id {id} for approval", projectId);
+                    return false;
+                }
+                project.Permission = Permissions.Approved;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error approving project {id}", projectId);
+                throw;
+            }
+        }
 
-//        public async Task<bool> RejectProjectAsync(int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects.FindAsync(projectId);
-//                if (project == null)
-//                {
-//                    _logger.LogError("Cant find project with id {id} for reject", projectId);
-//                    return false;
-//                }
-//                project.Permission = Permissions.Rejected;
-//                await _context.SaveChangesAsync();
-//                return true;
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error approving project {id}", projectId);
-//                throw;
-//            }
-//        }
+        public async Task<bool> RejectProjectAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects.FindAsync(projectId);
+                if (project == null)
+                {
+                    _logger.LogError("Cant find project with id {id} for reject", projectId);
+                    return false;
+                }
+                project.Permission = Permissions.Rejected;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error approving project {id}", projectId);
+                throw;
+            }
+        }
 
-//        public async Task<List<Project>> SearchProjectAsync(string name)
-//        {
-//            try
-//            {
-//                var project =await _context.Projects
-//                    .Where(p => p.Name.Contains(name))
-//                    .ToListAsync();
-//                return project;
-               
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error searching name");
-//                throw;
-//            }
+        public async Task<List<Project>> SearchProjectAsync(string name)
+        {
+            try
+            {
+                var project = await _context.Projects
+                    .Where(p => p.Name.Contains(name))
+                    .ToListAsync();
+                return project;
 
-//        }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching name");
+                throw;
+            }
 
-//        public async Task<List<Project>> GetProjectsSortedByPriceAsync(bool ascending = true)
-//        {
-//            try
-//            {
-//                var projects = _context.Projects.AsQueryable();
+        }
 
-//                projects = ascending
-//                    ? projects.OrderBy(p => p.Price)
-//                    : projects.OrderByDescending(p => p.Price);
-//                return await projects.ToListAsync();
-//            }
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting Projects sorted");
-//                throw;
-//            }
-//        }
+        public async Task<List<Project>> GetProjectsSortedByPriceAsync(bool ascending = true)
+        {
+            try
+            {
+                var projects = _context.Projects.AsQueryable();
 
-//        public async Task<bool> HasUserPurchasedProjectAsync(int userId, int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects
-//                .Include(p => p.Buyers)
-//                .FirstOrDefaultAsync(p => p.Id == projectId);
+                projects = ascending
+                    ? projects.OrderBy(p => p.Price)
+                    : projects.OrderByDescending(p => p.Price);
+                return await projects.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Projects sorted");
+                throw;
+            }
+        }
 
-//                if (project == null)
-//                {
-//                    _logger.LogError("Cant find project with id {id} for reject", projectId);
-//                    return false;
-//                }
+        public async Task<bool> HasUserPurchasedProjectAsync(int userId, int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                .Include(p => p.Buyers)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
 
-//                return project.Buyers.Any(u => u.Id == userId);
-//            }
+                if (project == null)
+                {
+                    _logger.LogError("Cant find project with id {id} for reject", projectId);
+                    return false;
+                }
 
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error checkng user {id1} bought project {id2}", userId, projectId);
-//                throw;
-//            }
-//        }
-//        public async Task<bool> IsProjectOwnedByUserAsync(int userId, int projectId)
-//        {
-//            try
-//            {
-//                var OwnerId = await _context.Projects
-//                .Where(p => p.Id == projectId)
-//                .Select(p => p.OwnerId)
-//                .FirstOrDefaultAsync();
+                return project.Buyers.Any(u => u.Id == userId);
+            }
 
-//                if (OwnerId == 0)
-//                {
-//                    _logger.LogError("Cannot find project with id {ProjectId}", projectId);
-//                    return false;
-//                }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checkng user {id1} bought project {id2}", userId, projectId);
+                throw;
+            }
+        }
+        public async Task<bool> IsProjectOwnedByUserAsync(int userId, int projectId)
+        {
+            try
+            {
+                var OwnerId = await _context.Projects
+                .Where(p => p.Id == projectId)
+                .Select(p => p.OwnerId)
+                .FirstOrDefaultAsync();
 
-//                return OwnerId == userId;
-//            }
+                if (OwnerId == 0)
+                {
+                    _logger.LogError("Cannot find project with id {ProjectId}", projectId);
+                    return false;
+                }
 
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error checkng user {id1} is owner of project {id2}", userId, projectId);
-//                throw;
-//            }
-//        }
+                return OwnerId == userId;
+            }
 
-//        public async Task<Decimal> GetTotalRevenueForProjectAsync(int projectId)
-//        {
-//            try
-//            {
-//                var project = await _context.Projects
-//                .Include(p => p.Orders)
-//                .FirstOrDefaultAsync(p => p.Id == projectId);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checkng user {id1} is owner of project {id2}", userId, projectId);
+                throw;
+            }
+        }
 
-//                decimal totalRevenue = (project?.Orders.Count ?? 0) * project?.Price ?? 0;
+        public async Task<Decimal> GetTotalRevenueForProjectAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                .Include(p => p.Orders)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
 
-//                return totalRevenue;
-//            }
+                decimal totalRevenue = (project?.Orders.Count ?? 0) * project?.Price ?? 0;
 
-//            catch (Exception ex)
-//            {
-//                _logger.LogError(ex, "Error getting revenue for project {id}", projectId);
-//                throw;
-//            }
-//        }
+                return totalRevenue;
+            }
 
-//    }
-//}
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting revenue for project {id}", projectId);
+                throw;
+            }
+        }
+
+    }
+}

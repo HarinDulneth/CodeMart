@@ -1,26 +1,6 @@
 version: "3.8"
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: codemart-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: codemart
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - codemart-network
-
   # ASP.NET Core API
   api:
     build:
@@ -33,23 +13,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      - DB_CONNECTION_STRING=Host=postgres;Port=5432;Database=codemart;Username=postgres;Password=${POSTGRES_PASSWORD:-postgres};SSL Mode=Disable
+      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
       - JWT_KEY=${JWT_KEY:-YourSuperSecretKeyThatShouldBeAtLeast32CharactersLongForHS256Algorithm}
       - JWT_ISSUER=${JWT_ISSUER:-CodeMart.Server}
       - JWT_AUDIENCE=${JWT_AUDIENCE:-CodeMart.Client}
       - JWT_ACCESS_TOKEN_EXPIRATION_MINUTES=${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:-60}
       - SUPABASE_PROJECT_URL=${SUPABASE_PROJECT_URL}
       - SUPABASE_API_KEY=${SUPABASE_API_KEY}
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - codemart-network
     restart: unless-stopped
-
-volumes:
-  postgres_data:
-
-networks:
-  codemart-network:
-    driver: bridge

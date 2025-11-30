@@ -32,7 +32,7 @@ cd CodeMart.Server
    ```
 
 2. Edit `.env` file and fill in your values:
-   - `POSTGRES_PASSWORD`: A strong password for PostgreSQL
+   - `DB_CONNECTION_STRING`: Your Supabase database connection string (get from Supabase Dashboard → Settings → Database)
    - `JWT_KEY`: A secret key (at least 32 characters) for JWT token signing
    - `SUPABASE_PROJECT_URL`: Your Supabase project URL
    - `SUPABASE_API_KEY`: Your Supabase API key
@@ -40,7 +40,7 @@ cd CodeMart.Server
 ### Step 3: Run with Docker Compose
 
 ```bash
-# Build and start all services (database + API)
+# Build and start the API service (database is on Supabase)
 docker-compose up -d
 
 # View logs to ensure everything started correctly
@@ -71,16 +71,12 @@ docker-compose exec api dotnet ef database update
 
 When you run `docker-compose up -d`, it starts:
 
-1. **PostgreSQL Database** (port 5432)
-
-   - Container: `codemart-postgres`
-   - Database: `codemart`
-   - Data persists in Docker volume: `postgres_data`
-
-2. **ASP.NET Core API** (port 8080)
+1. **ASP.NET Core API** (port 8080)
    - Container: `codemart-api`
-   - Automatically connects to PostgreSQL
+   - Connects to Supabase database (configured via `DB_CONNECTION_STRING`)
    - Runs database migrations on startup (Development mode)
+
+**Note:** The database is hosted on Supabase, not in a Docker container. Make sure your `.env` file has the correct `DB_CONNECTION_STRING` pointing to your Supabase instance.
 
 ## 🔧 Common Commands
 
@@ -93,17 +89,16 @@ docker-compose down
 
 # View logs
 docker-compose logs -f api          # API logs
-docker-compose logs -f postgres     # Database logs
 docker-compose logs -f              # All logs
 
-# Restart a service
+# Restart the service
 docker-compose restart api
 
 # Check service status
 docker-compose ps
 
-# Stop and remove everything (including database data)
-docker-compose down -v
+# Stop the service
+docker-compose down
 ```
 
 ## 🛠️ Development Mode
@@ -155,7 +150,7 @@ See `.env.example` for all required environment variables.
 
 **Required:**
 
-- `DB_CONNECTION_STRING` - PostgreSQL connection string (auto-set in docker-compose)
+- `DB_CONNECTION_STRING` - Supabase PostgreSQL connection string (get from Supabase Dashboard)
 - `JWT_KEY` - Secret key for JWT tokens (min 32 characters)
 - `SUPABASE_PROJECT_URL` - Your Supabase project URL
 - `SUPABASE_API_KEY` - Your Supabase API key
@@ -168,27 +163,29 @@ See `.env.example` for all required environment variables.
 
 ## 🗄️ Database Management
 
-### Access PostgreSQL
+Since the database is hosted on Supabase, you can manage it through:
+
+### Supabase Dashboard
+
+- Access your database via the Supabase Dashboard
+- Use the SQL Editor for queries
+- Manage tables, users, and permissions through the UI
+
+### Using psql (if installed locally)
 
 ```bash
-# Connect to PostgreSQL container
-docker-compose exec postgres psql -U postgres -d codemart
-
-# Or from host machine (if you have psql installed)
-psql -h localhost -p 5432 -U postgres -d codemart
+# Connect to Supabase database
+psql "Host=db.your-project.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=your-password;SSL Mode=Require"
 ```
 
 ### Backup Database
 
 ```bash
-docker-compose exec postgres pg_dump -U postgres codemart > backup.sql
+# Using pg_dump (if installed locally)
+pg_dump "Host=db.your-project.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=your-password;SSL Mode=Require" > backup.sql
 ```
 
-### Restore Database
-
-```bash
-docker-compose exec -T postgres psql -U postgres codemart < backup.sql
-```
+Or use Supabase Dashboard → Database → Backups for automated backups.
 
 ## 🐛 Troubleshooting
 
@@ -203,19 +200,22 @@ ports:
 
 ### Database Connection Issues
 
-1. Check if PostgreSQL is running:
+1. Verify your Supabase database is accessible:
+
+   - Check your Supabase project dashboard
+   - Ensure the database is not paused
+   - Verify your connection string format
+
+2. Check API logs for connection errors:
 
    ```bash
-   docker-compose ps
+   docker-compose logs api
    ```
 
-2. Check database logs:
-
-   ```bash
-   docker-compose logs postgres
-   ```
-
-3. Verify connection string in `.env` file
+3. Verify connection string in `.env` file:
+   - Ensure `DB_CONNECTION_STRING` is set correctly
+   - Format: `Host=db.your-project.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=your-password;SSL Mode=Require;Trust Server Certificate=true`
+   - Get it from Supabase Dashboard → Settings → Database
 
 ### Migration Issues
 

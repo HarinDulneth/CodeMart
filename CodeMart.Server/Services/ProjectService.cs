@@ -76,17 +76,17 @@ namespace CodeMart.Server.Services
             }
         }
 
-        public async Task<List<Project>> GetProjectsBetweenPriceAsync(decimal LowPrice, decimal HighPrice)
+        public async Task<List<Project>> GetProjectsBetweenPriceAsync(decimal lowPrice, decimal highPrice)
         {
             try
             {
                 return await _context.Projects
-                .Where(p => p.Price >= LowPrice && p.Price <= HighPrice)
+                .Where(p => p.Price >= lowPrice && p.Price <= highPrice)
                 .ToListAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Projects between prices {price1} {price2}", LowPrice, HighPrice);
+                _logger.LogError(ex, "Error getting Projects between prices {price1} {price2}", lowPrice, highPrice);
                 throw;
             }
 
@@ -158,6 +158,7 @@ namespace CodeMart.Server.Services
             }
         }
 
+
         public async Task<Project?> UpdateProjectAsync(Project project)
         {
             try
@@ -169,17 +170,14 @@ namespace CodeMart.Server.Services
                     return null;
                 }
 
-                // Update fields
                 existingProject.Name = project.Name;
                 existingProject.Category = project.Category;
                 existingProject.Description = project.Description;
                 existingProject.Price = project.Price;
                 existingProject.ProjectUrl = project.ProjectUrl;
                 existingProject.VideoUrl = project.VideoUrl;
-                existingProject.UploadDate = project.UploadDate;
                 existingProject.Permission = project.Permission;
                 existingProject.ImageUrls = project.ImageUrls;
-                existingProject.OwnerId = project.OwnerId;
 
                 await _context.SaveChangesAsync();
                 return existingProject;
@@ -190,6 +188,7 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
 
         public async Task<bool> DeleteProjectAsync(int id)
         {
@@ -258,10 +257,10 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                var project = await _context.Projects
+                var projects = await _context.Projects
                     .Where(p => p.Name.Contains(name))
                     .ToListAsync();
-                return project;
+                return projects;
 
             }
             catch (Exception ex)

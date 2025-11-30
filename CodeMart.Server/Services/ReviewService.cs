@@ -84,8 +84,6 @@ namespace CodeMart.Server.Services
                     _logger.LogError("Cant find transaction with id {id} for update", review.Id);
                     return null;
                 }
-                existingReview.ProjectId = review.ProjectId;
-                existingReview.ReviewerId = review.ReviewerId;
                 existingReview.Comment = review.Comment;
                 existingReview.DateAdded = review.DateAdded;
                 existingReview.Rating = review.Rating;

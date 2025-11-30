@@ -12,25 +12,22 @@ This guide explains how to run the CodeMart.Server application using Docker.
 
 ### Option 1: Using Docker Compose (Recommended)
 
-This will start both the API and PostgreSQL database:
+This will start the API service (database is hosted on Supabase):
 
 ```bash
-# Build and start all services
+# Build and start the API service
 docker-compose up -d
 
 # View logs
 docker-compose logs -f api
 
-# Stop all services
+# Stop the service
 docker-compose down
-
-# Stop and remove volumes (WARNING: This deletes database data)
-docker-compose down -v
 ```
 
-### Option 2: Using Docker Only (API Only)
+**Note:** This setup uses Supabase for the database. Make sure your `.env` file contains the `DB_CONNECTION_STRING` pointing to your Supabase instance.
 
-If you already have a PostgreSQL database running:
+### Option 2: Using Docker Only (Standalone)
 
 ```bash
 # Build the image
@@ -49,17 +46,24 @@ docker run -d \
 
 ## Environment Variables
 
-Create a `.env` file in the root directory (optional, for docker-compose):
+Create a `.env` file in the root directory with the following variables:
 
 ```env
-POSTGRES_PASSWORD=your-secure-password
+# Supabase Database Connection (REQUIRED)
+DB_CONNECTION_STRING=Host=db.your-project-id.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=your-password;SSL Mode=Require;Trust Server Certificate=true
+
+# JWT Configuration (REQUIRED)
 JWT_KEY=YourSuperSecretKeyThatShouldBeAtLeast32CharactersLongForHS256Algorithm
 JWT_ISSUER=CodeMart.Server
 JWT_AUDIENCE=CodeMart.Client
-JWT_EXPIRATION=60
-SUPABASE_PROJECT_URL=https://your-project.supabase.co
+JWT_ACCESS_TOKEN_EXPIRATION_MINUTES=60
+
+# Supabase Configuration (REQUIRED)
+SUPABASE_PROJECT_URL=https://your-project-id.supabase.co
 SUPABASE_API_KEY=your-supabase-api-key
 ```
+
+**Important:** The `DB_CONNECTION_STRING` must point to your Supabase database. Get this from your Supabase project settings under Database → Connection string.
 
 ## Configuration
 
@@ -76,7 +80,7 @@ docker-compose exec api dotnet ef database update
 
 - **API**: `http://localhost:8080` (HTTP)
 - **API**: `https://localhost:8081` (HTTPS - if configured)
-- **PostgreSQL**: `localhost:5432`
+- **Database**: Hosted on Supabase (configured via `DB_CONNECTION_STRING`)
 
 ### Changing Ports
 
@@ -141,19 +145,22 @@ docker-compose logs -f api
 
 ### Database Connection Issues
 
-1. Ensure PostgreSQL container is healthy:
+1. Verify your Supabase database is accessible:
+
+   - Check your Supabase project dashboard
+   - Ensure the database is not paused
+   - Verify your connection string is correct
+
+2. Check API logs for connection errors:
 
    ```bash
-   docker-compose ps
+   docker-compose logs api
    ```
 
-2. Check database logs:
-
-   ```bash
-   docker-compose logs postgres
-   ```
-
-3. Verify connection string in environment variables
+3. Verify connection string in `.env` file:
+   - Ensure `DB_CONNECTION_STRING` is set correctly
+   - Format: `Host=db.your-project.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=your-password;SSL Mode=Require;Trust Server Certificate=true`
+   - Get the connection string from Supabase Dashboard → Settings → Database
 
 ### Migration Issues
 
@@ -178,9 +185,8 @@ ports:
 # All services
 docker-compose logs -f
 
-# Specific service
+# API service only
 docker-compose logs -f api
-docker-compose logs -f postgres
 ```
 
 ## Clean Up
@@ -189,8 +195,8 @@ docker-compose logs -f postgres
 # Stop containers
 docker-compose down
 
-# Remove containers and volumes
-docker-compose down -v
+# Remove containers (no volumes needed since database is on Supabase)
+docker-compose down
 
 # Remove images
 docker rmi codemart-server
@@ -200,9 +206,10 @@ docker rmi codemart-server
 
 1. **Never commit `.env` files** with real credentials
 2. **Use strong JWT keys** in production (at least 32 characters)
-3. **Change default PostgreSQL password** in production
+3. **Protect your Supabase credentials** - keep them secure and rotate passwords regularly
 4. **Use HTTPS** in production (configure in `Program.cs`)
 5. **Limit exposed ports** to only what's necessary
+6. **Use Supabase connection pooling** for better performance and security
 
 ## Additional Resources
 

@@ -16,5 +16,6 @@ namespace CodeMart.Server.Interfaces
         Task<List<Project>> GetWishlistAsync(int userId);
         Task<List<Project>> GetSellingProjectsAsync(int userId);
         Task<List<Project>> GetPurchasedProjectsAsync(int userId);
+        Task<User?> ValidateUserCredentialsAsync(string email, string password);
     }
 }

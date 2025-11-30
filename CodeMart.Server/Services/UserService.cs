@@ -262,5 +262,32 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
+        public async Task<User?> ValidateUserCredentialsAsync(string email, string password)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    _logger.LogWarning("No user found with email {Email}", email);
+                    return null;
+                }
+
+                var passwordMatches = BCrypt.Net.BCrypt.Verify(password, user.Password);
+                if (!passwordMatches)
+                {
+                    _logger.LogWarning("Invalid password attempt for user {Email}", email);
+                    return null;
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating credentials for {Email}", email);
+                throw;
+            }
+        }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using CodeMart.CodeMart.Server.Models;
-using CodeMart.Server.DTOs;
 using CodeMart.Server.DTOs.User;
 using CodeMart.Server.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CodeMart.Server.Utils;
+using CodeMart.Server.DTOs.Project;
 
 namespace CodeMart.Server.Controllers
 { 
@@ -12,9 +14,14 @@ namespace CodeMart.Server.Controllers
     {
         private readonly IUserService _userService;
 
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
-        {
+        { 
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
             {
@@ -122,12 +129,26 @@ namespace CodeMart.Server.Controllers
             );
         }
 
+
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateUser(int id, UserDtoIn dtoIn)
+        [Authorize]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDtoIn dtoIn)
         {
             if (dtoIn == null)
             {
                 return BadRequest("Bad Request.");
+            }
+
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            var isAdmin = ControllerHelpers.IsCurrentUserAdmin(User);
+            if (currentUserId != id && !isAdmin)
+            {
+                return Forbid("You can only update your own profile.");
             }
 
             var updatedUser = await _userService.UpdateUserAsync(id, new User
@@ -162,8 +183,14 @@ namespace CodeMart.Server.Controllers
         }
 
         [HttpDelete("delete/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            if (!ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("Only administrators can delete users.");
+            }
+
             var result = await _userService.DeleteUserAsync(id);
             if (!result)
             {
@@ -175,6 +202,11 @@ namespace CodeMart.Server.Controllers
         [HttpGet("{id}/selling")]
         public async Task<IActionResult> GetSellingProjects(int id)
         {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
             var projects = await _userService.GetSellingProjectsAsync(id);
 
             if (projects == null || projects.Count == 0)
@@ -183,7 +215,6 @@ namespace CodeMart.Server.Controllers
             }
             var projectsDtos = projects.Select(p => new ProjectDto
             {
-                Id = p.Id,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -199,8 +230,20 @@ namespace CodeMart.Server.Controllers
         }
 
         [HttpPut("addtowishlist")]
+        [Authorize]
         public async Task<IActionResult> AddtoWishList([FromQuery] int userId, [FromQuery] int projectId)
         {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != userId)
+            {
+                return Forbid("You can only add items to your own wishlist.");
+            }
+
             var result = await _userService.AddProjectToWishlistAsync(userId, projectId);
 
             if (!result)
@@ -212,8 +255,20 @@ namespace CodeMart.Server.Controllers
         }
 
         [HttpPut("removefromwishlist")]
+        [Authorize]
         public async Task<IActionResult> RemoveFromWishList([FromQuery] int userId, [FromQuery] int projectId)
         {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != userId)
+            {
+                return Forbid("You can only remove items from your own wishlist.");
+            }
+
             var result = await _userService.RemoveProjectFromWishlistAsync(userId, projectId);
 
             if (!result)
@@ -221,7 +276,7 @@ namespace CodeMart.Server.Controllers
                 return StatusCode(500, "Internal Server Error.");
             }
 
-            return Ok("Project added to WishList");
+            return Ok("Project removed from WishList");
         }
 
         [HttpGet("{id}/wishlist")]
@@ -235,7 +290,6 @@ namespace CodeMart.Server.Controllers
 
             var wishListDto = wishlist.Select(p => new ProjectDto
             {
-                Id = p.Id,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -252,8 +306,20 @@ namespace CodeMart.Server.Controllers
         }
 
         [HttpGet("{id}/boughtprojects")]
+        [Authorize]
         public async Task<IActionResult> GetPurchasedProjects(int id)
         {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != id && !ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("You can only view your own purchased projects.");
+            }
+
             var purchased = await _userService.GetPurchasedProjectsAsync(id);
             if (purchased == null || purchased.Count == 0)
             {
@@ -262,7 +328,6 @@ namespace CodeMart.Server.Controllers
 
             var purchasedListDto = purchased.Select(p => new ProjectDto
             {
-                Id = p.Id,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -277,5 +342,6 @@ namespace CodeMart.Server.Controllers
 
             return Ok(purchasedListDto);
         }
+
     }
 }

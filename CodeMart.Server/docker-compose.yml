@@ -20,4 +20,8 @@ services:
       - JWT_ACCESS_TOKEN_EXPIRATION_MINUTES=${JWT_ACCESS_TOKEN_EXPIRATION_MINUTES:-60}
       - SUPABASE_PROJECT_URL=${SUPABASE_PROJECT_URL}
       - SUPABASE_API_KEY=${SUPABASE_API_KEY}
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     restart: unless-stopped

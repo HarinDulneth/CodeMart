@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DotNetEnv;
 using Supabase;
+using Npgsql;
 
 Env.Load();
 
@@ -32,7 +33,108 @@ builder.Services.AddSingleton(provider => new Supabase.Client(supabaseUrl, supab
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
     ?? throw new InvalidOperationException("DB_CONNECTION_STRING environment variable is required");
 
-IServiceCollection serviceCollection = builder.Services.AddDbContext<AppDbContext>(options =>
+// Configure Npgsql to prefer IPv4 (fixes Docker IPv6 connectivity issues)
+// Handle both URI format (postgresql://...) and standard connection string format
+string? hostname = null;
+NpgsqlConnectionStringBuilder? connectionBuilder = null;
+
+try
+{
+    // Check if connection string is in URI format
+    if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) ||
+        connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
+    {
+        // Parse URI format: postgresql://user:password@host:port/database
+        var uri = new Uri(connectionString);
+        hostname = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var database = uri.AbsolutePath.TrimStart('/');
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "";
+        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+        
+        // Convert to standard Npgsql connection string format
+        connectionBuilder = new NpgsqlConnectionStringBuilder
+        {
+            Host = hostname,
+            Port = port,
+            Database = database,
+            Username = username,
+            Password = password,
+            SslMode = SslMode.Require,
+            TrustServerCertificate = true
+        };
+        
+        // Add any query parameters from URI (if present)
+        if (!string.IsNullOrEmpty(uri.Query) && uri.Query.Length > 1)
+        {
+            var queryString = uri.Query.Substring(1); // Remove leading '?'
+            var queryParams = queryString.Split('&');
+            foreach (var param in queryParams)
+            {
+                var keyValue = param.Split('=', 2);
+                if (keyValue.Length == 2 && !string.IsNullOrEmpty(keyValue[0]))
+                {
+                    var key = Uri.UnescapeDataString(keyValue[0]);
+                    var value = Uri.UnescapeDataString(keyValue[1]);
+                    connectionBuilder[key] = value;
+                }
+            }
+        }
+    }
+    else
+    {
+        // Standard connection string format
+        connectionBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+        hostname = connectionBuilder.Host;
+    }
+    
+    // Resolve hostname to IPv4 address to avoid IPv6 connection issues in Docker
+    if (!string.IsNullOrEmpty(hostname) && !System.Net.IPAddress.TryParse(hostname, out _))
+    {
+        try
+        {
+            // Resolve hostname to get IPv4 address
+            var hostEntry = System.Net.Dns.GetHostEntry(hostname);
+            var ipv4Address = hostEntry.AddressList
+                .FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            
+            if (ipv4Address != null)
+            {
+                // Replace hostname with IPv4 address to force IPv4 connection
+                connectionBuilder.Host = ipv4Address.ToString();
+                connectionString = connectionBuilder.ConnectionString;
+                Console.WriteLine($"Resolved {hostname} to IPv4: {ipv4Address}");
+            }
+            else
+            {
+                Console.WriteLine($"Warning: No IPv4 address found for {hostname}. Using original hostname.");
+                connectionString = connectionBuilder.ConnectionString;
+            }
+        }
+        catch (Exception ex)
+        {
+            // If DNS resolution fails, use original connection string
+            Console.WriteLine($"Warning: Could not resolve {hostname} to IPv4: {ex.Message}. Using original hostname.");
+            connectionString = connectionBuilder.ConnectionString;
+        }
+    }
+    else
+    {
+        // Already an IP address or no hostname, use as-is
+        connectionString = connectionBuilder.ConnectionString;
+    }
+}
+catch (Exception ex)
+{
+    throw new InvalidOperationException(
+        $"Invalid DB_CONNECTION_STRING format: {ex.Message}. " +
+        "Please check your connection string format. " +
+        "Supported formats: 'postgresql://user:pass@host:port/db' or 'Host=host;Port=5432;Database=db;Username=user;Password=pass'",
+        ex);
+}
+
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Configure JWT Options from environment variables
@@ -88,6 +190,21 @@ if (!string.IsNullOrWhiteSpace(jwtOptions.Key))
     });
 }
 
+// Configure CORS for frontend access
+var allowedOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(',') 
+    ?? new[] { "http://localhost:3000", "http://localhost:5173", "http://localhost:4200", "http://localhost:5174" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -124,6 +241,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS (must be before UseAuthentication and UseAuthorization)
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

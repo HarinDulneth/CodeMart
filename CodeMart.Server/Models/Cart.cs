@@ -1,11 +1,11 @@
 ﻿using CodeMart.CodeMart.Server.Models;
+using CodeMart.Server.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeMart.Server.Models
 {
-    [Table("projects", Schema = "public")]
-    public class Project
+    public class Cart
     {
         [Key]
         public int Id { get; set; }
@@ -37,7 +37,7 @@ namespace CodeMart.Server.Models
         public List<string> ImageUrls { get; set; } = new List<string>();
 
         [Required]
-        public List<string>? PrimaryLanguages { get; set; }
+        public string PrimaryLanguage { get; set; }
 
         [Required]
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
@@ -51,8 +51,6 @@ namespace CodeMart.Server.Models
         public List<Review> Review { get; set; } = [];
 
         public List<User> WishlistedBy { get; set; } = [];
-
-        public List<User> CartedBy { get; set; } = [];
 
         public List<Order> Orders { get; set; } = [];
     }

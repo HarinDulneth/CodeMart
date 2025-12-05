@@ -242,6 +242,98 @@ namespace CodeMart.Server.Services
             }
         }
 
+        public async Task<bool> AddToCartAsync(int userId, int projectId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.CartProjects)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return false;
+                }
+
+                var project = await _context.Projects.FindAsync(projectId);
+                if (project == null)
+                {
+                    _logger.LogWarning("Project with ID {ProjectId} not found", projectId);
+                    return false;
+                }
+
+                if (!user.CartProjects.Any(p => p.Id == projectId))
+                {
+                    user.CartProjects.Add(project);
+                    await _context.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding project {ProjectId} to wishlist for user {UserId}", projectId, userId);
+                throw;
+            }
+        }
+
+        public async Task<bool> RemoveProjectFromCartAsync(int userId, int projectId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.CartProjects)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return false;
+                }
+
+                var project = user.CartProjects.FirstOrDefault(p => p.Id == projectId);
+                if (project == null)
+                {
+                    _logger.LogWarning("Project with ID {ProjectId} not found in Cart for user {UserId}", projectId, userId);
+                    return false;
+                }
+
+                user.CartProjects.Remove(project);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Removed project {ProjectId} from cart for user {UserId}", projectId, userId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing project {ProjectId} from cart for user {UserId}", projectId, userId);
+                throw;
+            }
+        }
+
+        public async Task<List<Project>> GetCartAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.CartProjects)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return new List<Project>();
+                }
+                return user.CartProjects;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error getting cart from user {UserId}", userId);
+                throw;
+            }
+        }
+
         public async Task<List<Project>> GetPurchasedProjectsAsync(int userId)
         {
             try

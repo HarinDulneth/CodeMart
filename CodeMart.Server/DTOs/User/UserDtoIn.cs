@@ -9,6 +9,5 @@
         public string Occupation { get; set; }
         public string? CompanyName { get; set; }
         public string? ProfilePicture { get; set; }
-        public bool IsAdmin { get; set; }
     }
 }

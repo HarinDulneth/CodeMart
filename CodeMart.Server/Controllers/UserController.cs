@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CodeMart.Server.Utils;
 using CodeMart.Server.DTOs.Project;
+using CodeMart.Server.DTOs;
 
 namespace CodeMart.Server.Controllers
 { 
@@ -36,7 +37,7 @@ namespace CodeMart.Server.Controllers
                 Occupation = user.Occupation,
                 CompanyName = user.CompanyName,
                 ProfilePicture = user.ProfilePicture,
-                IsAdmin = user.IsAdmin
+                IsAdmin = user.IsAdmin,
             };
             return Ok(dto);
         }
@@ -85,51 +86,6 @@ namespace CodeMart.Server.Controllers
             return Ok(dtos);
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> CreateUser([FromBody] UserDtoIn dtoIn)
-        {
-            if (dtoIn == null)
-            {
-                return BadRequest("Bad Request.");
-            }
-
-            var user = new User
-            {
-                FirstName = dtoIn.FirstName,
-                LastName = dtoIn.LastName,
-                Email = dtoIn.Email,
-                Password = dtoIn.Password,
-                Occupation = dtoIn.Occupation,
-                CompanyName = dtoIn.CompanyName,
-                ProfilePicture = dtoIn.ProfilePicture,
-                IsAdmin = dtoIn.IsAdmin
-            };
-
-            var createdUser = await _userService.CreateUserAsync(user);
-            if (createdUser == null)
-            {
-                return StatusCode(500, "Internal Server Error.");
-            }
-
-            var dtoOut = new UserDtoOut
-            {
-                Id = createdUser.Id,
-                FirstName = createdUser.FirstName,
-                LastName = createdUser.LastName,
-                Email = createdUser.Email,
-                Occupation = createdUser.Occupation,
-                CompanyName = createdUser.CompanyName,
-                ProfilePicture = createdUser.ProfilePicture,
-                IsAdmin = createdUser.IsAdmin
-            };
-            return CreatedAtAction(
-                nameof(GetUserById),
-                new { id = createdUser.Id },
-                dtoOut
-            );
-        }
-
-
         [HttpPut("update/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDtoIn dtoIn)
@@ -160,7 +116,7 @@ namespace CodeMart.Server.Controllers
                 Occupation = dtoIn.Occupation,
                 CompanyName = dtoIn.CompanyName,
                 ProfilePicture = dtoIn.ProfilePicture,
-                IsAdmin = dtoIn.IsAdmin
+                IsAdmin = false
             });
 
             if (updatedUser == null)
@@ -223,7 +179,7 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
+                PrimaryLanguages = p.PrimaryLanguages,
                 SecondaryLanguages = p.SecondaryLanguages
             }).ToList();
             return Ok(projectsDtos);
@@ -298,12 +254,90 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
+                PrimaryLanguages = p.PrimaryLanguages,
                 SecondaryLanguages = p.SecondaryLanguages
             }).ToList();
 
             return Ok(wishListDto);
         }
+
+
+        [HttpPut("addtocart")]
+        [Authorize]
+        public async Task<IActionResult> AddtoCart([FromQuery] int userId, [FromQuery] int projectId)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != userId)
+            {
+                return Forbid("You can only add items to your own Cart.");
+            }
+
+            var result = await _userService.AddToCartAsync(userId, projectId);
+
+            if (!result)
+            {
+                return StatusCode(500, "Internal Server Error.");
+            }
+
+            return Ok("Project added to Cart");
+        }
+
+        [HttpPut("removefromcart")]
+        [Authorize]
+        public async Task<IActionResult> RemoveFromCart([FromQuery] int userId, [FromQuery] int projectId)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != userId)
+            {
+                return Forbid("You can only remove items from your own cart.");
+            }
+
+            var result = await _userService.RemoveProjectFromCartAsync(userId, projectId);
+
+            if (!result)
+            {
+                return StatusCode(500, "Internal Server Error.");
+            }
+
+            return Ok("Project removed from Cart");
+        }
+
+        [HttpGet("{id}/cart")]
+        public async Task<IActionResult> GetCart(int id)
+        {
+            var cart = await _userService.GetCartAsync(id);
+            if (cart == null || cart.Count == 0)
+            {
+                return Ok(new List<ProjectDto>());
+            }
+
+            var cartDto = cart.Select(p => new ProjectDto
+            {
+                Name = p.Name,
+                Category = p.Category,
+                Description = p.Description,
+                Price = p.Price,
+                ProjectUrl = p.ProjectUrl,
+                VideoUrl = p.VideoUrl,
+                UploadDate = p.UploadDate,
+                ImageUrls = p.ImageUrls,
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages
+            }).ToList();
+
+            return Ok(cartDto);
+        }
+
 
         [HttpGet("{id}/boughtprojects")]
         [Authorize]
@@ -336,7 +370,7 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
+                PrimaryLanguages = p.PrimaryLanguages,
                 SecondaryLanguages = p.SecondaryLanguages
             }).ToList();
 

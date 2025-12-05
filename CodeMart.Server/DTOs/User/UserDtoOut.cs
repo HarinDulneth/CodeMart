@@ -1,4 +1,6 @@
-﻿namespace CodeMart.Server.DTOs.User
+﻿using CodeMart.Server.Models;
+
+namespace CodeMart.Server.DTOs.User
 {
     public class UserDtoOut
     {
@@ -10,5 +12,6 @@
         public string? CompanyName { get; set; }
         public string? ProfilePicture { get; set; }
         public bool IsAdmin { get; set; }
+        public List<OrderDto> Orders { get; set; } = [];
     }
 }

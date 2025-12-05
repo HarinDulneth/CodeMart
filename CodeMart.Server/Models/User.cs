@@ -52,6 +52,9 @@ namespace CodeMart.CodeMart.Server.Models
         [InverseProperty("WishlistedBy")]
         public List<Project> WishlistedProjects { get; set; } = [];
 
+        [InverseProperty("CartedBy")]
+        public List<Project> CartProjects { get; set; } = [];
+
         [InverseProperty("Reviewer")]
         public List<Review> Reviews { get; set; } = [];
 

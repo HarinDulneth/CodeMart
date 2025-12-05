@@ -35,7 +35,9 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                return await _context.Projects.ToListAsync();
+                return await _context.Projects
+                    .Include(p => p.Owner)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {

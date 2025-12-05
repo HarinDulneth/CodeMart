@@ -128,9 +128,9 @@ namespace CodeMart.Server.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("PrimaryLanguage")
+                    b.PrimitiveCollection<List<string>>("PrimaryLanguages")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<string>("ProjectUrl")
                         .IsRequired()
@@ -237,6 +237,21 @@ namespace CodeMart.Server.Data.Migrations
 
             modelBuilder.Entity("ProjectUser1", b =>
                 {
+                    b.Property<int>("CartProjectsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CartedById")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CartProjectsId", "CartedById");
+
+                    b.HasIndex("CartedById");
+
+                    b.ToTable("ProjectUser1", "public");
+                });
+
+            modelBuilder.Entity("ProjectUser2", b =>
+                {
                     b.Property<int>("WishlistedById")
                         .HasColumnType("integer");
 
@@ -247,7 +262,7 @@ namespace CodeMart.Server.Data.Migrations
 
                     b.HasIndex("WishlistedProjectsId");
 
-                    b.ToTable("ProjectUser1", "public");
+                    b.ToTable("ProjectUser2", "public");
                 });
 
             modelBuilder.Entity("CodeMart.Server.Models.Order", b =>
@@ -326,6 +341,21 @@ namespace CodeMart.Server.Data.Migrations
                 });
 
             modelBuilder.Entity("ProjectUser1", b =>
+                {
+                    b.HasOne("CodeMart.Server.Models.Project", null)
+                        .WithMany()
+                        .HasForeignKey("CartProjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CodeMart.CodeMart.Server.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("CartedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjectUser2", b =>
                 {
                     b.HasOne("CodeMart.CodeMart.Server.Models.User", null)
                         .WithMany()

@@ -53,7 +53,7 @@ namespace CodeMart.Server.Data.Migrations
                     UploadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Permission = table.Column<int>(type: "integer", nullable: false),
                     ImageUrls = table.Column<List<string>>(type: "text[]", nullable: false),
-                    PrimaryLanguage = table.Column<string>(type: "text", nullable: false),
+                    PrimaryLanguages = table.Column<List<string>>(type: "text[]", nullable: false),
                     SecondaryLanguages = table.Column<List<string>>(type: "text[]", nullable: false),
                     OwnerId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -133,21 +133,48 @@ namespace CodeMart.Server.Data.Migrations
                 schema: "public",
                 columns: table => new
                 {
+                    CartProjectsId = table.Column<int>(type: "integer", nullable: false),
+                    CartedById = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectUser1", x => new { x.CartProjectsId, x.CartedById });
+                    table.ForeignKey(
+                        name: "FK_ProjectUser1_projects_CartProjectsId",
+                        column: x => x.CartProjectsId,
+                        principalSchema: "public",
+                        principalTable: "projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProjectUser1_users_CartedById",
+                        column: x => x.CartedById,
+                        principalSchema: "public",
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProjectUser2",
+                schema: "public",
+                columns: table => new
+                {
                     WishlistedById = table.Column<int>(type: "integer", nullable: false),
                     WishlistedProjectsId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProjectUser1", x => new { x.WishlistedById, x.WishlistedProjectsId });
+                    table.PrimaryKey("PK_ProjectUser2", x => new { x.WishlistedById, x.WishlistedProjectsId });
                     table.ForeignKey(
-                        name: "FK_ProjectUser1_projects_WishlistedProjectsId",
+                        name: "FK_ProjectUser2_projects_WishlistedProjectsId",
                         column: x => x.WishlistedProjectsId,
                         principalSchema: "public",
                         principalTable: "projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProjectUser1_users_WishlistedById",
+                        name: "FK_ProjectUser2_users_WishlistedById",
                         column: x => x.WishlistedById,
                         principalSchema: "public",
                         principalTable: "users",
@@ -238,9 +265,15 @@ namespace CodeMart.Server.Data.Migrations
                 column: "BuyersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectUser1_WishlistedProjectsId",
+                name: "IX_ProjectUser1_CartedById",
                 schema: "public",
                 table: "ProjectUser1",
+                column: "CartedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectUser2_WishlistedProjectsId",
+                schema: "public",
+                table: "ProjectUser2",
                 column: "WishlistedProjectsId");
 
             migrationBuilder.CreateIndex(
@@ -272,6 +305,10 @@ namespace CodeMart.Server.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProjectUser1",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "ProjectUser2",
                 schema: "public");
 
             migrationBuilder.DropTable(

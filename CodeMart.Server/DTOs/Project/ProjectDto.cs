@@ -5,15 +5,19 @@ namespace CodeMart.Server.DTOs.Project
 {
     public class ProjectDto
     {
+        public int Id { get; set; }
+        public int OwnerId { get; set; }
         public string Name { get; set; }
         public Category Category { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string ProjectUrl { get; set; }
+        public List<Review>? Review { get; set; } = new List<Review>();
         public string? VideoUrl { get; set; }
         public DateTime UploadDate { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
-        public string PrimaryLanguage { get; set; }
+        public List<string>? PrimaryLanguages { get; set; }
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
+        public Permissions Permission { get; set; }
     }
 }

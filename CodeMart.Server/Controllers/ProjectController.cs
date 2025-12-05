@@ -34,6 +34,8 @@ namespace CodeMart.Server.Controllers
 
             var dto = new ProjectDto
             {
+                Id = project.Id,
+                OwnerId = project.OwnerId,
                 Name = project.Name,
                 Category = project.Category,
                 Description = project.Description,
@@ -42,8 +44,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = project.VideoUrl,
                 UploadDate = project.UploadDate,
                 ImageUrls = project.ImageUrls,
-                PrimaryLanguage = project.PrimaryLanguage,
-                SecondaryLanguages = project.SecondaryLanguages
+                PrimaryLanguages = project.PrimaryLanguages,
+                SecondaryLanguages = project.SecondaryLanguages,
+                Permission = project.Permission
             };
             return Ok(dto);
         }
@@ -56,8 +59,10 @@ namespace CodeMart.Server.Controllers
             {
                 return Ok(new List<ProjectDto>());
             }
-            var dtos = projects.Select(p => new ProjectDto
+            var dtos = projects.Select(p => new Project
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -66,8 +71,11 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                Review = p.Review,
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission,
+                Owner = p.Owner
             }).ToList();
             return Ok(dtos);
         }
@@ -82,6 +90,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -90,8 +100,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -106,6 +117,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -114,8 +127,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -130,6 +144,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -138,8 +154,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -201,6 +218,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -209,8 +228,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -244,7 +264,7 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = dto.VideoUrl,
                 UploadDate = DateTime.UtcNow,
                 ImageUrls = dto.ImageUrls,
-                PrimaryLanguage = dto.PrimaryLanguage,
+                PrimaryLanguages = dto.PrimaryLanguages,
                 SecondaryLanguages = dto.SecondaryLanguages,
                 Owner = owner
             };
@@ -257,6 +277,8 @@ namespace CodeMart.Server.Controllers
 
             var dtoOut = new ProjectDto
             {
+                Id = createdProject.Id,
+                OwnerId = createdProject.OwnerId,
                 Name = createdProject.Name,
                 Category = createdProject.Category,
                 Description = createdProject.Description,
@@ -265,8 +287,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = createdProject.VideoUrl,
                 UploadDate = createdProject.UploadDate,
                 ImageUrls = createdProject.ImageUrls,
-                PrimaryLanguage = createdProject.PrimaryLanguage,
-                SecondaryLanguages = createdProject.SecondaryLanguages
+                PrimaryLanguages = createdProject.PrimaryLanguages,
+                SecondaryLanguages = createdProject.SecondaryLanguages,
+                Permission = createdProject.Permission
             };
             return CreatedAtAction(
                 nameof(GetProjectId),
@@ -333,6 +356,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -341,8 +366,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -363,6 +389,8 @@ namespace CodeMart.Server.Controllers
             }
             var dtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -371,8 +399,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                PrimaryLanguage = p.PrimaryLanguage,
-                SecondaryLanguages = p.SecondaryLanguages
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(dtos);
         }
@@ -449,7 +478,7 @@ namespace CodeMart.Server.Controllers
                 ProjectUrl = dto.ProjectUrl,
                 VideoUrl = dto.VideoUrl,
                 ImageUrls = dto.ImageUrls,
-                PrimaryLanguage = dto.PrimaryLanguage,
+                PrimaryLanguages = dto.PrimaryLanguages,
                 SecondaryLanguages = dto.SecondaryLanguages,
                 Owner = owner
             });
@@ -461,6 +490,8 @@ namespace CodeMart.Server.Controllers
 
             var dtoOut = new ProjectDto
             {
+                Id = updatedProject.Id,
+                OwnerId = updatedProject.OwnerId,
                 Name = updatedProject.Name,
                 Category = updatedProject.Category,
                 Description = updatedProject.Description,
@@ -469,8 +500,9 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = updatedProject.VideoUrl,
                 UploadDate = updatedProject.UploadDate,
                 ImageUrls = updatedProject.ImageUrls,
-                PrimaryLanguage = updatedProject.PrimaryLanguage,
-                SecondaryLanguages = updatedProject.SecondaryLanguages
+                PrimaryLanguages = updatedProject.PrimaryLanguages,
+                SecondaryLanguages = updatedProject.SecondaryLanguages,
+                Permission = updatedProject.Permission
             };
             return Ok(dtoOut);
         }

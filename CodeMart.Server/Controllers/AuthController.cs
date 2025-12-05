@@ -1,3 +1,4 @@
+using CodeMart.CodeMart.Server.Models;
 using CodeMart.Server.DTOs.User;
 using CodeMart.Server.Interfaces;
 using CodeMart.Server.Utils;
@@ -47,24 +48,28 @@ namespace CodeMart.Server.Controllers
                 return Unauthorized("Invalid token.");
             }
 
-            var user = await _userService.GetUserByIdAsync(currentUserId.Value);
+            var user = await _authenticateService.GetCurrentUser(currentUserId.Value);
             if (user == null)
             {
                 return NotFound("User not found.");
             }
+            return Ok(user);
+        }
 
-            var dto = new UserDtoOut
+        [HttpPost("signup")]
+        public async Task<IActionResult> Signup([FromBody] UserDtoIn dtoIn)
+        {
+            if (dtoIn == null)
             {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Occupation = user.Occupation,
-                CompanyName = user.CompanyName,
-                ProfilePicture = user.ProfilePicture,
-                IsAdmin = user.IsAdmin
-            };
-            return Ok(dto);
+                return BadRequest("Bad Request.");
+            }
+
+            var token = await _authenticateService.Signup(dtoIn);
+            if (token == null)
+            {
+                return StatusCode(500, "Internal Server Error.");
+            }
+            return Ok(new { token = token });
         }
     }
 }

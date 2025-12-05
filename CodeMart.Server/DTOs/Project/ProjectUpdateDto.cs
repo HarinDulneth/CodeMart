@@ -12,7 +12,7 @@ namespace CodeMart.Server.DTOs.Project
         public string ProjectUrl { get; set; }
         public string? VideoUrl { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
-        public string PrimaryLanguage { get; set; }
+        public List<string>? PrimaryLanguages { get; set; }
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
     }
 }

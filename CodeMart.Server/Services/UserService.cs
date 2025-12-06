@@ -93,6 +93,11 @@ namespace CodeMart.Server.Services
                 existingUser.ProfilePicture = user.ProfilePicture;
                 existingUser.IsAdmin = user.IsAdmin;
 
+                if (!string.IsNullOrWhiteSpace(user.Password))
+                {
+                    existingUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                }
+
                 await _context.SaveChangesAsync();
 
                 return existingUser;

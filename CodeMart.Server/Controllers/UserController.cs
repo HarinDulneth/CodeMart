@@ -246,6 +246,8 @@ namespace CodeMart.Server.Controllers
 
             var wishListDto = wishlist.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -255,7 +257,8 @@ namespace CodeMart.Server.Controllers
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
                 PrimaryLanguages = p.PrimaryLanguages,
-                SecondaryLanguages = p.SecondaryLanguages
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
 
             return Ok(wishListDto);

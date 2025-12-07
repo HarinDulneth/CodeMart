@@ -407,12 +407,6 @@ namespace CodeMart.Server.Services
             }
         }
 
-        public async Task<User?> GetUserByEmail(string email)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
-
-
         public async Task<User?> ValidateUserCredentialsAsync(string email, string password)
         {
             try

@@ -6,8 +6,6 @@ namespace CodeMart.Server.Interfaces
     public interface IUserService
     {
         Task<User?> GetUserByIdAsync(int id);
-        Task<User?> GetUserByEmail(string email);
-
         Task<User?> GetUserByEmailAsync(string email);
         Task<List<User>> GetAllUsersAsync();
         Task<User?> CreateUserAsync(User user);

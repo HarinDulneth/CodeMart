@@ -171,6 +171,8 @@ namespace CodeMart.Server.Controllers
             }
             var projectsDtos = projects.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -180,7 +182,8 @@ namespace CodeMart.Server.Controllers
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
                 PrimaryLanguages = p.PrimaryLanguages,
-                SecondaryLanguages = p.SecondaryLanguages
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
             return Ok(projectsDtos);
         }
@@ -246,6 +249,8 @@ namespace CodeMart.Server.Controllers
 
             var wishListDto = wishlist.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -255,7 +260,8 @@ namespace CodeMart.Server.Controllers
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
                 PrimaryLanguages = p.PrimaryLanguages,
-                SecondaryLanguages = p.SecondaryLanguages
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
 
             return Ok(wishListDto);
@@ -312,6 +318,31 @@ namespace CodeMart.Server.Controllers
             return Ok("Project removed from Cart");
         }
 
+        [HttpPut("buy")]
+        [Authorize]
+        public async Task<IActionResult> BuyProject([FromQuery] int userId, [FromQuery] int projectId)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != userId)
+            {
+                return Forbid("You can only buy items for yourself.");
+            }
+
+            var result = await _userService.BuyProjectAsync(userId, projectId);
+
+            if (!result)
+            {
+                return StatusCode(500, "Internal Server Error.");
+            }
+
+            return Ok("Project Bought Successfully");
+        }
+
         [HttpGet("{id}/cart")]
         public async Task<IActionResult> GetCart(int id)
         {
@@ -323,6 +354,8 @@ namespace CodeMart.Server.Controllers
 
             var cartDto = cart.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -332,7 +365,8 @@ namespace CodeMart.Server.Controllers
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
                 PrimaryLanguages = p.PrimaryLanguages,
-                SecondaryLanguages = p.SecondaryLanguages
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
 
             return Ok(cartDto);
@@ -362,6 +396,8 @@ namespace CodeMart.Server.Controllers
 
             var purchasedListDto = purchased.Select(p => new ProjectDto
             {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
                 Name = p.Name,
                 Category = p.Category,
                 Description = p.Description,
@@ -371,7 +407,8 @@ namespace CodeMart.Server.Controllers
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
                 PrimaryLanguages = p.PrimaryLanguages,
-                SecondaryLanguages = p.SecondaryLanguages
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission
             }).ToList();
 
             return Ok(purchasedListDto);

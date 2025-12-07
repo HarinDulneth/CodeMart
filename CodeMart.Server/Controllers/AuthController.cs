@@ -1,7 +1,8 @@
-using CodeMart.CodeMart.Server.Models;
+﻿using CodeMart.CodeMart.Server.Models;
 using CodeMart.Server.DTOs.User;
 using CodeMart.Server.Interfaces;
 using CodeMart.Server.Utils;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,5 +72,67 @@ namespace CodeMart.Server.Controllers
             }
             return Ok(new { token = token });
         }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleTokenDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Token))
+                return BadRequest("Token is required.");
+
+            try
+            {
+                var payload = await GoogleJsonWebSignature.ValidateAsync(dto.Token,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] {
+                        "732606690978-h5c4rmj2tojdg2s51hfa82ve93l7v2tg.apps.googleusercontent.com"
+
+                    }
+                });
+
+                string email = payload.Email;
+                string name = payload.Name;
+                string picture = payload.Picture;
+
+                // Check existing user
+                var existingUser = await _userService.GetUserByEmail(email);
+
+                // If user does not exist, register using Google details
+                if (existingUser == null)
+                {
+                    var newUser = new UserDtoIn
+                    {
+                        Email = email,
+                        FirstName = name.Split(' ')[0],
+                        LastName = name.Contains(' ') ? name.Split(' ')[1] : "",
+                        ProfilePicture = picture,
+                        Password = Guid.NewGuid().ToString(), // needed for DB
+                        Occupation = "Not Provided",
+                        CompanyName = ""
+                    };
+
+
+                    // signup returns JWT token
+                    var token = await _authenticateService.Signup(newUser);
+                    return Ok(new { token });
+                }
+
+                // User exists → Login and return JWT
+                var finalToken = await _authenticateService.Login(email, null);
+
+                return Ok(new { token = finalToken });
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new
+                {
+                    message = "Google token validation failed",
+                    error = ex.Message,
+                    stack = ex.ToString()
+                });
+            }
+
+        }
+
     }
 }

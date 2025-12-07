@@ -16,6 +16,7 @@ namespace CodeMart.Server.Interfaces
         Task<List<Project>> GetWishlistAsync(int userId);
         Task<bool> AddToCartAsync(int userId, int projectId);
         Task<bool> RemoveProjectFromCartAsync(int userId, int projectId);
+        Task<bool> BuyProjectAsync(int userId, int projectId);
         Task<List<Project>> GetCartAsync(int userId);
         Task<List<Project>> GetSellingProjectsAsync(int userId);
         Task<List<Project>> GetPurchasedProjectsAsync(int userId);

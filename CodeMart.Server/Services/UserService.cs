@@ -317,6 +317,42 @@ namespace CodeMart.Server.Services
             }
         }
 
+        public async Task<bool> BuyProjectAsync(int userId, int projectId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.BoughtProjects)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", userId);
+                    return false;
+                }
+
+                var project = await _context.Projects.FindAsync(projectId);
+                if (project == null)
+                {
+                    _logger.LogWarning("Project with ID {ProjectId} not found", projectId);
+                    return false;
+                }
+
+                if (!user.BoughtProjects.Any(p => p.Id == projectId))
+                {
+                    user.BoughtProjects.Add(project);
+                    await _context.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error buying project {ProjectId} for user {UserId}", projectId, userId);
+                throw;
+            }
+        }
+
         public async Task<List<Project>> GetCartAsync(int userId)
         {
             try

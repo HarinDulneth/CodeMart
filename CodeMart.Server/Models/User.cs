@@ -30,14 +30,12 @@ namespace CodeMart.CodeMart.Server.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public bool IsAdmin { get; set; } = false;
 
         [Required]
-        public string Occupation { get; set; }
+        public string? Occupation { get; set; }
 
         public string? CompanyName { get; set; }
 

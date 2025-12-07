@@ -16,10 +16,21 @@ namespace CodeMart.Server.Services
             _jwtTokenService = JwtTokenService;
         }
 
-        public async Task<string?> Login(string email, string password)
+        public async Task<string?> Login(string email, string? password)
         {
-            var user = await _userService.ValidateUserCredentialsAsync(email, password);
+            // Google login -> no password
+            if (password == null)
+            {
+                var existingUser = await _userService.GetUserByEmailAsync(email);
+                if (existingUser == null)
+                    return null;
 
+                string googleToken = _jwtTokenService.GenerateToken(existingUser);
+                return googleToken;
+            }
+
+            // Normal login
+            var user = await _userService.ValidateUserCredentialsAsync(email, password);
             if (user == null)
             {
                 return null;
@@ -28,6 +39,7 @@ namespace CodeMart.Server.Services
             string token = _jwtTokenService.GenerateToken(user);
             return token;
         }
+
 
 
         public async Task<UserDtoOut?> GetCurrentUser(int id)
@@ -63,29 +75,29 @@ namespace CodeMart.Server.Services
         public async Task<string?> Signup(UserDtoIn dtoIn)
         {
             if (dtoIn == null)
-            {
                 return null;
-            }
+
             var user = new User
             {
                 FirstName = dtoIn.FirstName,
                 LastName = dtoIn.LastName,
                 Email = dtoIn.Email,
-                Password = dtoIn.Password,
+                Password = dtoIn.Password, // will be null for Google user
                 Occupation = dtoIn.Occupation,
                 CompanyName = dtoIn.CompanyName,
                 ProfilePicture = dtoIn.ProfilePicture,
                 IsAdmin = false
             };
 
+            // If signup from Google, no password
+
             var createdUser = await _userService.CreateUserAsync(user);
             if (createdUser == null)
-            {
                 return null;
-            }
 
             string token = _jwtTokenService.GenerateToken(createdUser);
             return token;
         }
+
     }
 }

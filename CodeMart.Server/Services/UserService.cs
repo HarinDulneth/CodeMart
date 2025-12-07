@@ -61,7 +61,17 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                // Only hash password if provided (normal signup)
+                if (!string.IsNullOrWhiteSpace(user.Password))
+                {
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                }
+                else
+                {
+                    // Google signup: Assign random value or empty
+                    user.Password = Guid.NewGuid().ToString(); // no password stored
+                }
+
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
                 return user;
@@ -72,6 +82,7 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
 
         public async Task<User?> UpdateUserAsync(int id, User user)
         {
@@ -395,6 +406,12 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
 
         public async Task<User?> ValidateUserCredentialsAsync(string email, string password)
         {

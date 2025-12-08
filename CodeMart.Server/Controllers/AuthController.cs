@@ -94,8 +94,7 @@ namespace CodeMart.Server.Controllers
                 string name = payload.Name;
                 string picture = payload.Picture;
 
-                // Check existing user
-                var existingUser = await _userService.GetUserByEmail(email);
+                var existingUser = await _userService.GetUserByEmailAsync(email);
 
                 // If user does not exist, register using Google details
                 if (existingUser == null)

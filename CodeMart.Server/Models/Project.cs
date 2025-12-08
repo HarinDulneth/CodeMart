@@ -25,8 +25,6 @@ namespace CodeMart.Server.Models
         [Required]
         public string ProjectUrl { get; set; }
 
-        [Required]
-
         public string? VideoUrl { get; set; }
 
         [Required]

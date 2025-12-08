@@ -330,8 +330,11 @@ namespace CodeMart.Server.Services
 
         public async Task<bool> BuyProjectAsync(int userId, int projectId)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
+                var added = false;
                 var user = await _context.Users
                     .Include(u => u.BoughtProjects)
                     .FirstOrDefaultAsync(u => u.Id == userId);
@@ -349,12 +352,29 @@ namespace CodeMart.Server.Services
                     return false;
                 }
 
-                if (!user.BoughtProjects.Any(p => p.Id == projectId))
+                if (user.BoughtProjects.Any(p => p.Id == projectId))
                 {
-                    user.BoughtProjects.Add(project);
-                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("User {UserId} already bought project {ProjectId}", userId, projectId);
+                    return false;
                 }
 
+                user.BoughtProjects.Add(project);
+                await _context.SaveChangesAsync();
+                var order = new Order
+                {
+                    Amount = project.Price,
+                    OrderDate = DateTime.UtcNow,
+                    BuyerId = userId,
+                    ProjectId = projectId,
+                    IsCompleted = true,
+                    Buyer = user,
+                    Project = project
+                };
+
+                await _context.Orders.AddAsync(order);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
                 return true;
             }
             catch (Exception ex)
@@ -406,12 +426,6 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
-
-        public async Task<User?> GetUserByEmail(string email)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
-
 
         public async Task<User?> ValidateUserCredentialsAsync(string email, string password)
         {

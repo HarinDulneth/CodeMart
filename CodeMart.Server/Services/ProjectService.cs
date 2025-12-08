@@ -180,6 +180,8 @@ namespace CodeMart.Server.Services
                 existingProject.VideoUrl = project.VideoUrl;
                 existingProject.Permission = project.Permission;
                 existingProject.ImageUrls = project.ImageUrls;
+                existingProject.PrimaryLanguages = project.PrimaryLanguages;
+                existingProject.SecondaryLanguages = project.SecondaryLanguages;
 
                 await _context.SaveChangesAsync();
                 return existingProject;
@@ -358,6 +360,7 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
 
     }
 }

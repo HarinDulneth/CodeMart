@@ -361,6 +361,33 @@ namespace CodeMart.Server.Services
             }
         }
 
+        public async Task<Decimal> GetTotalRevenueForProjectByMonthAsync(int projectId, int month)
+        {
+            try
+            {
+                var project = await _context.Projects
+                .Include(p => p.Orders)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
 
+                if (project == null)
+                {
+                    _logger.LogWarning("Project with ID {ProjectId} not found", projectId);
+                    return 0;
+                }
+
+                var monthlyOrders = project.Orders
+                    .Where(o => o.OrderDate.Month == month && o.IsCompleted)
+                    .ToList();
+
+                decimal totalRevenue = monthlyOrders.Count * project.Price;
+
+                return totalRevenue;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting revenue for project {id} in month {month}", projectId, month);
+                throw;
+            }
+        }
     }
 }

@@ -316,6 +316,23 @@ namespace CodeMart.Server.Controllers
             return Ok(revenue);
         }
 
+        [HttpGet("revenue/{id}/{month}")]
+        [Authorize]
+        public async Task<IActionResult> GetProjectRevenueByMonth(int id, int month)
+        {
+            var isAdmin = ControllerHelpers.IsCurrentUserAdmin(User);
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+
+            var project = await _projectService.GetProjectByIdAsync(id);
+
+            if (!isAdmin && project?.OwnerId != currentUserId)
+            {
+                return Forbid("You're not authorized");
+            }
+            var revenue = await _projectService.GetTotalRevenueForProjectByMonthAsync(id, month);
+            return Ok(revenue);
+        }
+
         [HttpGet("owned")]
         [Authorize]
         public async Task<IActionResult> IsProjectOwnedByUser([FromQuery] int projId)

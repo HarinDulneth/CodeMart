@@ -21,5 +21,9 @@ namespace CodeMart.Server.Interfaces
         Task<List<Project>> GetSellingProjectsAsync(int userId);
         Task<List<Project>> GetPurchasedProjectsAsync(int userId);
         Task<User?> ValidateUserCredentialsAsync(string email, string password);
+        Task<Decimal?> GetTotalRevenueforUserAsync(int userId);
+        Task<Decimal?> GetTotalRevenueforUserByMonthAsync(int userId, int month);
+        Task<Order[]?> GetTotalSalesforUserAsync(int userId);
+        Task<Order[]?> GetTotalSalesforUserByMonthAsync(int userId, int month);
     }
 }

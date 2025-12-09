@@ -352,13 +352,11 @@ namespace CodeMart.Server.Services
                     return false;
                 }
 
-                if (user.BoughtProjects.Any(p => p.Id == projectId))
+                if (!user.BoughtProjects.Any(p => p.Id == projectId))
                 {
-                    _logger.LogInformation("User {UserId} already bought project {ProjectId}", userId, projectId);
-                    return false;
+                    user.BoughtProjects.Add(project);
                 }
 
-                user.BoughtProjects.Add(project);
                 await _context.SaveChangesAsync();
                 var order = new Order
                 {
@@ -450,6 +448,144 @@ namespace CodeMart.Server.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error validating credentials for {Email}", email);
+                throw;
+            }
+        }
+
+        public async Task<Decimal?> GetTotalRevenueforUserAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                      .Include(u => u.SellingProjects)
+                      .FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("No user found with id {id}", userId);
+                    return null;
+                }
+
+                decimal totalRevenue = 0;
+
+                foreach (var project in user.SellingProjects)
+                {
+                    var projectOrders = await _context.Orders
+                        .Where(o => o.ProjectId == project.Id && o.IsCompleted)
+                        .CountAsync();
+                    
+                    totalRevenue += projectOrders * project.Price;
+                }
+
+                return totalRevenue;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting total revenue for user {userId}", userId);
+                throw;
+            }
+        }
+
+        public async Task<Decimal?> GetTotalRevenueforUserByMonthAsync(int userId, int month)
+        {
+            try
+            {
+                var user = await _context.Users
+                      .Include(u => u.SellingProjects)
+                      .FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("No user found with id {id}", userId);
+                    return null;
+                }
+
+                decimal totalRevenue = 0;
+
+                foreach (var project in user.SellingProjects)
+                {
+                    var projectOrders = await _context.Orders
+                        .Where(o => o.ProjectId == project.Id && o.IsCompleted && o.OrderDate.Month == month)
+                        .CountAsync();
+                    
+                    totalRevenue += projectOrders * project.Price;
+                }
+
+                return totalRevenue;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting total revenue for user {userId}", userId);
+                throw;
+            }
+        }
+
+        public async Task<Order[]?> GetTotalSalesforUserAsync(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                      .Include(u => u.SellingProjects)
+                      .FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("No user found with id {id}", userId);
+                    return null;
+                }
+
+                var totalSales = new List<Order>();
+
+                foreach (var project in user.SellingProjects)
+                {
+                    var projectOrders = await _context.Orders
+                        .Where(o => o.ProjectId == project.Id && o.IsCompleted)
+                        .Include(o => o.Project)
+                        .Include(o => o.Buyer)
+                        .Include(o => o.Transaction)
+                        .ToListAsync();
+                    
+                    totalSales.AddRange(projectOrders);
+                }
+
+                return totalSales.ToArray();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting total sales for user {userId}", userId);
+                throw;
+            }
+        }
+
+        public async Task<Order[]?> GetTotalSalesforUserByMonthAsync(int userId, int month)
+        {
+            try
+            {
+                var user = await _context.Users
+                      .Include(u => u.SellingProjects)
+                      .FirstOrDefaultAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("No user found with id {id}", userId);
+                    return null;
+                }
+
+                var totalSales = new List<Order>();
+
+                foreach (var project in user.SellingProjects)
+                {
+                    var projectOrders = await _context.Orders
+                        .Where(o => o.ProjectId == project.Id && o.IsCompleted && o.OrderDate.Month == month)
+                        .Include(o => o.Project)
+                        .Include(o => o.Buyer)
+                        .Include(o => o.Transaction)
+                        .ToListAsync();
+                    
+                    totalSales.AddRange(projectOrders);
+                }
+
+                return totalSales.ToArray();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting total sales for user {userId}", userId);
                 throw;
             }
         }

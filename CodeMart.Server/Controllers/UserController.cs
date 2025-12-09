@@ -414,5 +414,100 @@ namespace CodeMart.Server.Controllers
             return Ok(purchasedListDto);
         }
 
+        [HttpGet("revenue/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetRevenue(int id)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != id && !ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("You can only view your own revenue.");
+            }
+
+            var response = await _userService.GetTotalRevenueforUserAsync(id);
+            if (response == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("revenue/{id}/{month}")]
+        [Authorize]
+        public async Task<IActionResult> GetRevenueByMonth(int id, int month)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != id && !ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("You can only view your own revenue.");
+            }
+
+            var response = await _userService.GetTotalRevenueforUserByMonthAsync(id, month);
+            if (response == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("sales/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetSales(int id)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != id && !ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("You can only view your own Sales.");
+            }
+
+            var response = await _userService.GetTotalSalesforUserAsync(id);
+            if (response == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("sales/{id}/{month}")]
+        [Authorize]
+        public async Task<IActionResult> GetSalesByMonth(int id, int month)
+        {
+            var currentUserId = ControllerHelpers.GetCurrentUserId(User);
+            if (currentUserId == null)
+            {
+                return Unauthorized("Invalid token.");
+            }
+
+            if (currentUserId != id && !ControllerHelpers.IsCurrentUserAdmin(User))
+            {
+                return Forbid("You can only view your own Sales.");
+            }
+
+            var response = await _userService.GetTotalSalesforUserByMonthAsync(id, month);
+            if (response == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(response);
+        }
     }
 }

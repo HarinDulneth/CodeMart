@@ -26,7 +26,7 @@ namespace CodeMart.Server.Data.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: true),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: true),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
                     Occupation = table.Column<string>(type: "text", nullable: false),
                     CompanyName = table.Column<string>(type: "text", nullable: true),
@@ -55,6 +55,7 @@ namespace CodeMart.Server.Data.Migrations
                     ImageUrls = table.Column<List<string>>(type: "text[]", nullable: false),
                     PrimaryLanguages = table.Column<List<string>>(type: "text[]", nullable: false),
                     SecondaryLanguages = table.Column<List<string>>(type: "text[]", nullable: false),
+                    Features = table.Column<List<string>>(type: "text[]", nullable: false),
                     OwnerId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

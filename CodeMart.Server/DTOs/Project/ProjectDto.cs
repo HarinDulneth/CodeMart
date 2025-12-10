@@ -19,6 +19,7 @@ namespace CodeMart.Server.DTOs.Project
         public List<string> ImageUrls { get; set; } = new List<string>();
         public List<string>? PrimaryLanguages { get; set; }
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
+        public List<string>? Features { get; set; } = new List<string>();
         public Permissions Permission { get; set; }
     }
 }

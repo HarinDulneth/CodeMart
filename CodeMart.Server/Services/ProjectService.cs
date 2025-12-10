@@ -53,6 +53,7 @@ namespace CodeMart.Server.Services
                 var Projects = await _context.Projects
                     .Include(p => p.Review)
                     .Where(p => p.Review.Any() && p.Review.Average(r => r.Rating) > rating)
+                    .Include(p => p.Owner)
                     .ToListAsync();
                 return Projects;
             }
@@ -69,6 +70,8 @@ namespace CodeMart.Server.Services
             {
                 return await _context.Projects
                     .Where(p => p.Category == category)
+                    .Include(p => p.Owner)
+                    .Include(p => p.Review)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -84,6 +87,7 @@ namespace CodeMart.Server.Services
             {
                 return await _context.Projects
                 .Where(p => p.Price >= lowPrice && p.Price <= highPrice)
+                .Include(p => p.Owner)
                 .ToListAsync();
             }
             catch (Exception ex)
@@ -119,6 +123,7 @@ namespace CodeMart.Server.Services
             {
                 var project = await _context.Projects
                 .Include(p => p.Review)
+                .Include(p => p.Owner)
                 .FirstOrDefaultAsync(p => p.Id == projectId);
 
                 return project?.Review ?? new List<Review>();
@@ -136,6 +141,7 @@ namespace CodeMart.Server.Services
             {
                 return await _context.Projects
                     .Where(p => p.Permission == permission)
+                    .Include(p => p.Owner)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -263,6 +269,7 @@ namespace CodeMart.Server.Services
             {
                 var projects = await _context.Projects
                     .Where(p => EF.Functions.ILike(p.Name, $"%{name}%"))
+                    .Include(p => p.Owner)
                     .ToListAsync();
                 return projects;
 
@@ -284,7 +291,7 @@ namespace CodeMart.Server.Services
                 projects = ascending
                     ? projects.OrderBy(p => p.Price)
                     : projects.OrderByDescending(p => p.Price);
-                return await projects.ToListAsync();
+                return await projects.Include(p => p.Owner).ToListAsync();
             }
             catch (Exception ex)
             {

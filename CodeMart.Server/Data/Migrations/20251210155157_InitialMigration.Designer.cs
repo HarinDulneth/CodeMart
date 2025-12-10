@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CodeMart.Server.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251204204055_InitialMigration")]
+    [Migration("20251210155157_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -56,7 +56,6 @@ namespace CodeMart.Server.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ProfilePicture")
@@ -113,6 +112,10 @@ namespace CodeMart.Server.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.PrimitiveCollection<List<string>>("Features")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.PrimitiveCollection<List<string>>("ImageUrls")
                         .IsRequired()

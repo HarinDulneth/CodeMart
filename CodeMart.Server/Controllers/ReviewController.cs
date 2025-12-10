@@ -93,12 +93,6 @@ namespace CodeMart.Server.Controllers
                 return Unauthorized("Invalid token.");
             }
 
-            var isAdmin = ControllerHelpers.IsCurrentUserAdmin(User);
-            if (!isAdmin)
-            {
-                return Forbid("Not Authorized.");
-            }
-
             var reviewer = await _userService.GetUserByIdAsync((int)currentUserId);
             if (reviewer == null)
                 return NotFound($"Buyer with ID {currentUserId} not found.");
@@ -110,7 +104,7 @@ namespace CodeMart.Server.Controllers
             var review = new Review
             {
                 Comment = dto.Comment,
-                DateAdded = DateTime.UtcNow,
+                DateAdded = dto.DateAdded,
                 Rating = dto.Rating,
                 Reviewer = reviewer,
                 Project = project

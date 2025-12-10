@@ -46,7 +46,8 @@ namespace CodeMart.Server.Controllers
                 ImageUrls = project.ImageUrls,
                 PrimaryLanguages = project.PrimaryLanguages,
                 SecondaryLanguages = project.SecondaryLanguages,
-                Permission = project.Permission
+                Permission = project.Permission,
+                Features = project.Features
             };
             return Ok(dto);
         }
@@ -205,7 +206,8 @@ namespace CodeMart.Server.Controllers
                 ImageUrls = dto.ImageUrls,
                 PrimaryLanguages = dto.PrimaryLanguages,
                 SecondaryLanguages = dto.SecondaryLanguages,
-                Owner = owner
+                Owner = owner,
+                Features = dto.Features,
             };
 
             var createdProject = await _projectService.CreateProjectAsync(project);
@@ -228,7 +230,8 @@ namespace CodeMart.Server.Controllers
                 ImageUrls = createdProject.ImageUrls,
                 PrimaryLanguages = createdProject.PrimaryLanguages,
                 SecondaryLanguages = createdProject.SecondaryLanguages,
-                Permission = createdProject.Permission
+                Permission = createdProject.Permission,
+                Features = createdProject.Features,
             };
             return CreatedAtAction(
                 nameof(GetProjectId),
@@ -326,7 +329,7 @@ namespace CodeMart.Server.Controllers
             var projects = await _projectService.SearchProjectAsync(name);
             if (projects == null || projects.Count == 0)
             {
-                return Ok(new List<ProjectDto>());
+                return Ok(new List<Project>());
             }
             
             return Ok(projects);
@@ -406,7 +409,8 @@ namespace CodeMart.Server.Controllers
                 ImageUrls = dto.ImageUrls,
                 PrimaryLanguages = dto.PrimaryLanguages,
                 SecondaryLanguages = dto.SecondaryLanguages,
-                Owner = owner
+                Owner = owner,
+                Features = dto.Features,
             });
 
             if (updatedProject == null)
@@ -428,7 +432,8 @@ namespace CodeMart.Server.Controllers
                 ImageUrls = updatedProject.ImageUrls,
                 PrimaryLanguages = updatedProject.PrimaryLanguages,
                 SecondaryLanguages = updatedProject.SecondaryLanguages,
-                Permission = updatedProject.Permission
+                Permission = updatedProject.Permission,
+                Features = updatedProject.Features,
             };
             return Ok(dtoOut);
         }

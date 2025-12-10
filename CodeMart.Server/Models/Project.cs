@@ -37,10 +37,13 @@ namespace CodeMart.Server.Models
         public List<string> ImageUrls { get; set; } = new List<string>();
 
         [Required]
-        public List<string>? PrimaryLanguages { get; set; }
+        public List<string> PrimaryLanguages { get; set; } = new List<string>();
 
         [Required]
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
+
+        [Required]
+        public List<string> Features { get; set; } = new List<string>();
 
         public int OwnerId { get; set; }
         [ForeignKey("OwnerId")]

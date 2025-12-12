@@ -22,7 +22,10 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                return await _context.Projects.FindAsync(id);
+                return await _context.Projects
+                .Include(p => p.Review)
+                    .ThenInclude(r => r.Reviewer)
+                .FirstOrDefaultAsync(p => p.Id == id);
             }
             catch (Exception ex)
             {
@@ -278,7 +281,7 @@ namespace CodeMart.Server.Services
             {
                 _logger.LogError(ex, "Error searching name");
                 throw;
-            }
+            }   
 
         }
 

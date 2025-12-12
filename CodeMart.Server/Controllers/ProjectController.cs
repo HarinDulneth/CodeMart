@@ -47,6 +47,7 @@ namespace CodeMart.Server.Controllers
                 PrimaryLanguages = project.PrimaryLanguages,
                 SecondaryLanguages = project.SecondaryLanguages,
                 Permission = project.Permission,
+                Review =  project.Review,           
                 Features = project.Features
             };
             return Ok(dto);

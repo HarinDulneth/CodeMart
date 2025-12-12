@@ -274,6 +274,7 @@ namespace CodeMart.Server.Services
                 var projects = await _context.Projects
                     .Where(p => EF.Functions.ILike(p.Name, $"%{name}%"))
                     .Include(p => p.Owner)
+                    .Include(r => r.Review )
                     .ToListAsync();
                 return projects;
 

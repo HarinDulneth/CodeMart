@@ -40,6 +40,7 @@ namespace CodeMart.Server.Services
             {
                 return await _context.Projects
                     .Include(p => p.Owner)
+                    .Include(p => p.Review)
                     .ToListAsync();
             }
             catch (Exception ex)

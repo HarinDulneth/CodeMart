@@ -1,4 +1,5 @@
-﻿using CodeMart.Server.Models;
+﻿using CodeMart.Server.DTOs.Project;
+using CodeMart.Server.Models;
 
 namespace CodeMart.Server.DTOs.User
 {
@@ -13,5 +14,6 @@ namespace CodeMart.Server.DTOs.User
         public string? ProfilePicture { get; set; }
         public bool IsAdmin { get; set; }
         public List<OrderDto> Orders { get; set; } = [];
+        public int SellingProjectsCount { get; set; }
     }
 }

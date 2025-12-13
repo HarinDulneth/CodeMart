@@ -128,6 +128,14 @@ namespace CodeMart.Server.Controllers
             return Ok(featuredProjects);
         }
 
+       [HttpGet("ownerrating/{id}")]
+        public async Task<IActionResult> GetOwnerRating(int id)
+        {
+            var rating = await _projectService.GetOwnerRating(id);
+
+            return Ok(rating);
+        }
+        
         [HttpGet("buyers")]
         [Authorize]
         public async Task<IActionResult> GetBuyers([FromQuery] int projectId)

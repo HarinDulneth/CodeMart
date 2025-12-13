@@ -1,11 +1,13 @@
 ﻿using CodeMart.CodeMart.Server.Models;
+using CodeMart.Server.DTOs;
+using CodeMart.Server.DTOs.Project;
 using CodeMart.Server.DTOs.User;
 using CodeMart.Server.Interfaces;
+using CodeMart.Server.Models;
+using CodeMart.Server.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CodeMart.Server.Utils;
-using CodeMart.Server.DTOs.Project;
-using CodeMart.Server.DTOs;
+using Stripe;
 
 namespace CodeMart.Server.Controllers
 { 
@@ -28,6 +30,8 @@ namespace CodeMart.Server.Controllers
             {
                 return NotFound();
             }
+
+            var sellingProjectsCount = user.SellingProjects.Count;
             var dto = new UserDtoOut
             {
                 Id = user.Id,
@@ -38,6 +42,7 @@ namespace CodeMart.Server.Controllers
                 CompanyName = user.CompanyName,
                 ProfilePicture = user.ProfilePicture,
                 IsAdmin = user.IsAdmin,
+                SellingProjectsCount = sellingProjectsCount
             };
             return Ok(dto);
         }
@@ -508,6 +513,38 @@ namespace CodeMart.Server.Controllers
             }
 
             return Ok(response);
+        }
+
+        [HttpPost("create-payment-intent")]
+        [Authorize]
+        public async Task<IActionResult> CreatePaymentIntent([FromBody] CreatePaymentDto dto)
+        {
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = (long)(dto.Amount * 100),
+                Currency = "usd",
+                AutomaticPaymentMethods = new()
+                {
+                    Enabled = true
+                },
+                Metadata = new Dictionary<string, string>
+        {
+            { "userId", dto.UserId.ToString() },
+            { "projectId", dto.ProjectId.ToString() }
+        }
+            };
+
+            var service = new PaymentIntentService();
+            var intent = await service.CreateAsync(options);
+
+            var result = await _userService.BuyProjectAsync(dto.UserId, dto.ProjectId);
+
+            if (!result)
+            {
+                return StatusCode(500, "Internal Server Error.");
+            }
+
+            return Ok(new { clientSecret = intent.ClientSecret });
         }
     }
 }

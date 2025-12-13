@@ -20,6 +20,9 @@ var supabaseUrl = Environment.GetEnvironmentVariable("SUPABASE_PROJECT_URL")
 var supabaseApiKey = Environment.GetEnvironmentVariable("SUPABASE_API_KEY")
     ?? throw new InvalidOperationException("SUPABASE_API_KEY environment variable is required");
 
+Stripe.StripeConfiguration.ApiKey =
+    Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+
 var options = new SupabaseOptions
 {
     AutoRefreshToken = true,

@@ -22,7 +22,9 @@ namespace CodeMart.Server.Services
         {
             try
             {
-                return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                return await _context.Users
+                    .Include(u => u.SellingProjects)
+                    .FirstOrDefaultAsync(u => u.Id == id);
             }
             catch (Exception ex)
             {

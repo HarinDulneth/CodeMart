@@ -25,5 +25,6 @@ namespace CodeMart.Server.Interfaces
         Task<Decimal> GetTotalRevenueForProjectAsync(int projectId);
         Task<Decimal> GetTotalRevenueForProjectByMonthAsync(int projectId, int month);
         Task<List<Project>> GetFeaturedProjectsAsync(int count);
+        Task<double?> GetOwnerRating(int id);
     }
 }

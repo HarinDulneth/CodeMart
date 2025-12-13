@@ -434,5 +434,33 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
+        public async Task<double?> GetOwnerRating(int id)
+        {
+            try
+            {
+                var projectsWithRatings = await _context.Projects
+                    .Where(p => p.OwnerId == id)
+                    .Include(p => p.Review)                   
+                    .Select(p => new
+                    {
+                        Project = p,
+                        AverageRating = p.Review.Any()
+                            ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                            : 0
+                    })
+                    .ToListAsync();
+
+                double rating = projectsWithRatings.Any()
+                    ? Math.Round(projectsWithRatings.Average(p => p.AverageRating), 1)
+                    : 0;
+                return rating;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user rating");
+                throw;
+            }
+        }
     }
 }

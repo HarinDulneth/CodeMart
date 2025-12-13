@@ -401,5 +401,38 @@ namespace CodeMart.Server.Services
                 throw;
             }
         }
+
+        public async Task<List<Project>> GetFeaturedProjectsAsync(int count)
+        {
+            try
+            {
+                var projects = await _context.Projects
+                    .Include(p => p.Owner)
+                    .Include(p => p.Review)
+                    .Where(p => p.Permission == Permissions.Approved || p.Permission == Permissions.Pending)
+                    .ToListAsync();
+
+                var projectsWithRatings = projects
+                    .Select(p => new
+                    {
+                        Project = p,
+                        AverageRating = p.Review != null && p.Review.Count > 0
+                            ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                            : 0
+                    })
+                    .OrderByDescending(x => x.AverageRating)
+                    .ThenByDescending(x => x.Project.UploadDate)
+                    .Take(count)
+                    .Select(x => x.Project)
+                    .ToList();
+
+                return projectsWithRatings;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting featured projects");
+                throw;
+            }
+        }
     }
 }

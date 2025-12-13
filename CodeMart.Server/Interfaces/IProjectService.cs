@@ -24,5 +24,6 @@ namespace CodeMart.Server.Interfaces
         Task<bool> IsProjectOwnedByUserAsync(int userId, int projectId);
         Task<Decimal> GetTotalRevenueForProjectAsync(int projectId);
         Task<Decimal> GetTotalRevenueForProjectByMonthAsync(int projectId, int month);
+        Task<List<Project>> GetFeaturedProjectsAsync(int count);
     }
 }

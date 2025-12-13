@@ -117,6 +117,17 @@ namespace CodeMart.Server.Controllers
             return Ok(projects);
         }
 
+        [HttpGet("featured")]
+        public async Task<IActionResult> GetFeaturedProjects()
+        {
+            var featuredProjects = await _projectService.GetFeaturedProjectsAsync(7);
+            if (featuredProjects == null || featuredProjects.Count == 0)
+            {
+                return Ok(new List<Project>());
+            }
+            return Ok(featuredProjects);
+        }
+
         [HttpGet("buyers")]
         [Authorize]
         public async Task<IActionResult> GetBuyers([FromQuery] int projectId)

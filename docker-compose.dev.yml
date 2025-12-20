@@ -1,12 +1,6 @@
 version: "3.8"
 
-# Development docker-compose for local development
-# Use this when you want to run only the backend in Docker
-# Frontend can run locally with: npm run dev
-# Database is hosted on Supabase (cloud)
-
 services:
-  # ASP.NET Core API
   api:
     build:
       context: ./CodeMart.Server
@@ -18,9 +12,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      # Supabase Database Connection String
-      # Format: postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
-      # Or: Host=db.[project-ref].supabase.co;Port=5432;Database=postgres;Username=postgres;Password=[password]
       - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
       - JWT_KEY=${JWT_KEY:-YourSuperSecretKeyThatShouldBeAtLeast32CharactersLongForHS256Algorithm}
       - JWT_ISSUER=${JWT_ISSUER:-CodeMart.Server}
@@ -33,7 +24,6 @@ services:
       - codemart-network-dev
     restart: unless-stopped
     volumes:
-      # Mount source code for hot reload (optional)
       - ./CodeMart.Server:/src
     healthcheck:
       test:

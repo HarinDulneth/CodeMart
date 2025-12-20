@@ -2,7 +2,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
 COPY ["CodeMart.Server.csproj", "./"]
 RUN dotnet restore "CodeMart.Server.csproj"
 

@@ -5,7 +5,7 @@ COPY ["CodeMart.Server.csproj", "./"]
 RUN dotnet restore "CodeMart.Server.csproj"
 
 COPY . .
-WORKDIR "/src"
+WORKDIR /src
 RUN dotnet build "CodeMart.Server.csproj" -c Release -o /app/build
 
 FROM build AS publish

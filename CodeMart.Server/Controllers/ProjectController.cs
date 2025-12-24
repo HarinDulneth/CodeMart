@@ -112,6 +112,7 @@ namespace CodeMart.Server.Controllers
             if (projects == null || projects.Count == 0)
             {
                 return Ok(new List<ProjectDto>());
+
             }
             
             return Ok(projects);

@@ -46,11 +46,18 @@ services:
       dockerfile: Dockerfile
     container_name: codemart-frontend
     ports:
-      - "3000:80"
+      - "5173:5173"
     depends_on:
       - api
+    environment:
+      - DOCKER_ENV=true
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
     volumes:
-      - ./CodeMart-Frontend:/app
+      - ./CodeMart-Frontend/src:/app/src
+      - ./CodeMart-Frontend/public:/app/public
+      - ./CodeMart-Frontend/index.html:/app/index.html
+      - ./CodeMart-Frontend/vite.config.ts:/app/vite.config.ts
     networks:
       - codemart-network
     restart: unless-stopped

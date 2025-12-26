@@ -192,6 +192,7 @@ namespace CodeMart.Server.Services
                 existingProject.ImageUrls = project.ImageUrls;
                 existingProject.PrimaryLanguages = project.PrimaryLanguages;
                 existingProject.SecondaryLanguages = project.SecondaryLanguages;
+                existingProject.Features = project.Features;
 
                 await _context.SaveChangesAsync();
                 return existingProject;

@@ -52,6 +52,18 @@ namespace CodeMart.Server.Controllers
                     Rating = r.Rating,
                     DateAdded = r.DateAdded,
                     Comment = r.Comment,
+                    Reviewer = new UserDtoOut
+                    {
+                        Id = r.Reviewer.Id,
+                        FirstName = r.Reviewer.FirstName,
+                        LastName = r.Reviewer.LastName,
+                        FullName = r.Reviewer.FullName,
+                        Email = r.Reviewer.Email,
+                        Occupation = r.Reviewer.Occupation,
+                        CompanyName = r.Reviewer.CompanyName,
+                        ProfilePicture = r.Reviewer.ProfilePicture,
+                        IsAdmin = r.Reviewer.IsAdmin,
+                    }
                 }).ToList(),
                 Features = project.Features
             };

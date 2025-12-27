@@ -47,7 +47,12 @@ namespace CodeMart.Server.Controllers
                 PrimaryLanguages = project.PrimaryLanguages,
                 SecondaryLanguages = project.SecondaryLanguages,
                 Permission = project.Permission,
-                Review =  project.Review,           
+                Review = project.Review.Select(r => new ReviewDto
+                {
+                    Rating = r.Rating,
+                    DateAdded = r.DateAdded,
+                    Comment = r.Comment,
+                }).ToList(),
                 Features = project.Features
             };
             return Ok(dto);
@@ -61,7 +66,7 @@ namespace CodeMart.Server.Controllers
             {
                 return Ok(new List<ProjectDto>());
             }
-            var dtos = projects.Select(p => new Project
+            var dtos = projects.Select(p => new ProjectDto
             {
                 Id = p.Id,
                 OwnerId = p.OwnerId,
@@ -73,11 +78,33 @@ namespace CodeMart.Server.Controllers
                 VideoUrl = p.VideoUrl,
                 UploadDate = p.UploadDate,
                 ImageUrls = p.ImageUrls,
-                Review = p.Review,
+                Review = p.Review.Select(r => new ReviewDto
+                {
+                    Rating = r.Rating,
+                    DateAdded = r.DateAdded,
+                    Comment = r.Comment,
+                }).ToList(),
                 PrimaryLanguages = p.PrimaryLanguages,
                 SecondaryLanguages = p.SecondaryLanguages,
                 Permission = p.Permission,
-                Owner = p.Owner
+                Features = p.Features,
+                Owner = new UserDtoOut
+                {
+                    Id = p.Owner.Id,
+                    FirstName = p.Owner.FirstName,
+                    LastName = p.Owner.LastName,
+                    FullName = p.Owner.FullName,
+                    Email = p.Owner.Email,
+                    Occupation = p.Owner.Occupation,
+                    CompanyName = p.Owner.CompanyName,
+                    ProfilePicture = p.Owner.ProfilePicture,
+                    IsAdmin = p.Owner.IsAdmin,
+                },
+                Buyers = p.Buyers.Select(b => b.Id).ToList(),
+                CreatedAt = p.UploadDate,
+                Rating = p.Review.Count > 0 
+                    ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                    : 0
             }).ToList();
             return Ok(dtos);
         }
@@ -91,7 +118,47 @@ namespace CodeMart.Server.Controllers
                 return Ok(new List<ProjectDto>());
             }
             
-            return Ok(projects);
+            var dtos = projects.Select(p => new ProjectDto
+            {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
+                Name = p.Name,
+                Category = p.Category,
+                Description = p.Description,
+                Price = p.Price,
+                ProjectUrl = p.ProjectUrl,
+                VideoUrl = p.VideoUrl,
+                UploadDate = p.UploadDate,
+                ImageUrls = p.ImageUrls,
+                Review = p.Review.Select(r => new ReviewDto
+                {
+                    Rating = r.Rating,
+                    DateAdded = r.DateAdded,
+                    Comment = r.Comment,
+                }).ToList(),
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission,
+                Features = p.Features,
+                Owner = new UserDtoOut
+                {
+                    Id = p.Owner.Id,
+                    FirstName = p.Owner.FirstName,
+                    LastName = p.Owner.LastName,
+                    FullName = p.Owner.FullName,
+                    Email = p.Owner.Email,
+                    Occupation = p.Owner.Occupation,
+                    CompanyName = p.Owner.CompanyName,
+                    ProfilePicture = p.Owner.ProfilePicture,
+                    IsAdmin = p.Owner.IsAdmin,
+                },
+                Buyers = p.Buyers.Select(b => b.Id).ToList(),
+                CreatedAt = p.UploadDate,
+                Rating = p.Review.Count > 0 
+                    ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                    : 0
+            }).ToList();
+            return Ok(dtos);
         }
 
         [HttpGet("filter/category")]
@@ -102,7 +169,47 @@ namespace CodeMart.Server.Controllers
             {
                 return Ok(new List<ProjectDto>());
             }
-            return Ok(projects);
+            var dtos = projects.Select(p => new ProjectDto
+            {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
+                Name = p.Name,
+                Category = p.Category,
+                Description = p.Description,
+                Price = p.Price,
+                ProjectUrl = p.ProjectUrl,
+                VideoUrl = p.VideoUrl,
+                UploadDate = p.UploadDate,
+                ImageUrls = p.ImageUrls,
+                Review = p.Review.Select(r => new ReviewDto
+                {
+                    Rating = r.Rating,
+                    DateAdded = r.DateAdded,
+                    Comment = r.Comment,
+                }).ToList(),
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission,
+                Features = p.Features,
+                Owner = new UserDtoOut
+                {
+                    Id = p.Owner.Id,
+                    FirstName = p.Owner.FirstName,
+                    LastName = p.Owner.LastName,
+                    FullName = p.Owner.FullName,
+                    Email = p.Owner.Email,
+                    Occupation = p.Owner.Occupation,
+                    CompanyName = p.Owner.CompanyName,
+                    ProfilePicture = p.Owner.ProfilePicture,
+                    IsAdmin = p.Owner.IsAdmin,
+                },
+                Buyers = p.Buyers.Select(b => b.Id).ToList(),
+                CreatedAt = p.UploadDate,
+                Rating = p.Review.Count > 0 
+                    ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                    : 0
+            }).ToList();
+            return Ok(dtos);
         }
 
         [HttpGet("filter/price")]
@@ -115,7 +222,47 @@ namespace CodeMart.Server.Controllers
 
             }
             
-            return Ok(projects);
+            var dtos = projects.Select(p => new ProjectDto
+            {
+                Id = p.Id,
+                OwnerId = p.OwnerId,
+                Name = p.Name,
+                Category = p.Category,
+                Description = p.Description,
+                Price = p.Price,
+                ProjectUrl = p.ProjectUrl,
+                VideoUrl = p.VideoUrl,
+                UploadDate = p.UploadDate,
+                ImageUrls = p.ImageUrls,
+                Review = p.Review.Select(r => new ReviewDto
+                {
+                    Rating = r.Rating,
+                    DateAdded = r.DateAdded,
+                    Comment = r.Comment,
+                }).ToList(),
+                PrimaryLanguages = p.PrimaryLanguages,
+                SecondaryLanguages = p.SecondaryLanguages,
+                Permission = p.Permission,
+                Features = p.Features,
+                Owner = new UserDtoOut
+                {
+                    Id = p.Owner.Id,
+                    FirstName = p.Owner.FirstName,
+                    LastName = p.Owner.LastName,
+                    FullName = p.Owner.FullName,
+                    Email = p.Owner.Email,
+                    Occupation = p.Owner.Occupation,
+                    CompanyName = p.Owner.CompanyName,
+                    ProfilePicture = p.Owner.ProfilePicture,
+                    IsAdmin = p.Owner.IsAdmin,
+                },
+                Buyers = p.Buyers.Select(b => b.Id).ToList(),
+                CreatedAt = p.UploadDate,
+                Rating = p.Review.Count > 0 
+                    ? Math.Round(p.Review.Average(r => r.Rating), 1)
+                    : 0
+            }).ToList();
+            return Ok(dtos);
         }
 
         [HttpGet("featured")]

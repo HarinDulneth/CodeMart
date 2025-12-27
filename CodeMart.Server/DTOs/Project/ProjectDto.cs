@@ -1,6 +1,6 @@
 ﻿using CodeMart.Server.Models;
 using System.ComponentModel.DataAnnotations;
-using CodeMart.Server.Models;
+using CodeMart.Server.DTOs.User;
 
 namespace CodeMart.Server.DTOs.Project
 {
@@ -13,7 +13,7 @@ namespace CodeMart.Server.DTOs.Project
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string ProjectUrl { get; set; }
-        public List<Review>? Review { get; set; } = new List<Review>();
+        public List<ReviewDto>? Review { get; set; } = new List<ReviewDto>();
         public string? VideoUrl { get; set; }
         public DateTime UploadDate { get; set; }
         public List<string> ImageUrls { get; set; } = new List<string>();
@@ -21,5 +21,9 @@ namespace CodeMart.Server.DTOs.Project
         public List<string>? SecondaryLanguages { get; set; } = new List<string>();
         public List<string>? Features { get; set; } = new List<string>();
         public Permissions Permission { get; set; }
+        public UserDtoOut? Owner { get; set; }
+        public List<int>? Buyers { get; set; } = new List<int>();
+        public DateTime CreatedAt { get; set; }
+        public double Rating { get; set; }
     }
 }

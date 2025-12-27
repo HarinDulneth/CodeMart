@@ -36,7 +36,19 @@ namespace CodeMart.Server.Controllers
             {
                 Comment = review.Comment,
                 DateAdded = review.DateAdded,
-                Rating = review.Rating
+                Rating = review.Rating,
+                Reviewer = new UserDtoOut
+                {
+                    Id = review.Reviewer.Id,
+                    FirstName = review.Reviewer.FirstName,
+                    LastName = review.Reviewer.LastName,
+                    FullName = review.Reviewer.FullName,
+                    Email = review.Reviewer.Email,
+                    Occupation = review.Reviewer.Occupation,
+                    CompanyName = review.Reviewer.CompanyName,
+                    ProfilePicture = review.Reviewer.ProfilePicture,
+                    IsAdmin = review.Reviewer.IsAdmin,
+                }
             };
             return Ok(dto);
         }
@@ -54,7 +66,19 @@ namespace CodeMart.Server.Controllers
             {
                 Comment = r.Comment,
                 DateAdded = r.DateAdded,
-                Rating = r.Rating
+                Rating = r.Rating,
+                Reviewer = new UserDtoOut
+                {
+                    Id = r.Reviewer.Id,
+                    FirstName = r.Reviewer.FirstName,
+                    LastName = r.Reviewer.LastName,
+                    FullName = r.Reviewer.FullName,
+                    Email = r.Reviewer.Email,
+                    Occupation = r.Reviewer.Occupation,
+                    CompanyName = r.Reviewer.CompanyName,
+                    ProfilePicture = r.Reviewer.ProfilePicture,
+                    IsAdmin = r.Reviewer.IsAdmin,
+                }
             }).ToList();
             return Ok(dtos);
         }
@@ -72,7 +96,19 @@ namespace CodeMart.Server.Controllers
             {
                 Comment = r.Comment,
                 DateAdded = r.DateAdded,
-                Rating = r.Rating
+                Rating = r.Rating,
+                Reviewer = new UserDtoOut
+                {
+                    Id = r.Reviewer.Id,
+                    FirstName = r.Reviewer.FirstName,
+                    LastName = r.Reviewer.LastName,
+                    FullName = r.Reviewer.FullName,
+                    Email = r.Reviewer.Email,
+                    Occupation = r.Reviewer.Occupation,
+                    CompanyName = r.Reviewer.CompanyName,
+                    ProfilePicture = r.Reviewer.ProfilePicture,
+                    IsAdmin = r.Reviewer.IsAdmin,
+                }
             }).ToList();
             return Ok(dtos);
         }
@@ -119,7 +155,19 @@ namespace CodeMart.Server.Controllers
             {
                 Comment = createdReview.Comment,
                 DateAdded = createdReview.DateAdded,
-                Rating = createdReview.Rating
+                Rating = createdReview.Rating,
+                Reviewer = new UserDtoOut
+                {
+                    Id = createdReview.Reviewer.Id,
+                    FirstName = createdReview.Reviewer.FirstName,
+                    LastName = createdReview.Reviewer.LastName,
+                    FullName = createdReview.Reviewer.FullName,
+                    Email = createdReview.Reviewer.Email,
+                    Occupation = createdReview.Reviewer.Occupation,
+                    CompanyName = createdReview.Reviewer.CompanyName,
+                    ProfilePicture = createdReview.Reviewer.ProfilePicture,
+                    IsAdmin = createdReview.Reviewer.IsAdmin,
+                }
             };
             return CreatedAtAction(
                 nameof(GetReviewById),
@@ -166,7 +214,19 @@ namespace CodeMart.Server.Controllers
             {
                 Comment = updatedReview.Comment,
                 DateAdded = updatedReview.DateAdded,
-                Rating = updatedReview.Rating
+                Rating = updatedReview.Rating,
+                Reviewer = new UserDtoOut
+                {
+                    Id = updatedReview.Reviewer.Id,
+                    FirstName = updatedReview.Reviewer.FirstName,
+                    LastName = updatedReview.Reviewer.LastName,
+                    FullName = updatedReview.Reviewer.FullName,
+                    Email = updatedReview.Reviewer.Email,
+                    Occupation = updatedReview.Reviewer.Occupation,
+                    CompanyName = updatedReview.Reviewer.CompanyName,
+                    ProfilePicture = updatedReview.Reviewer.ProfilePicture,
+                    IsAdmin = updatedReview.Reviewer.IsAdmin,
+                }
             };
             return Ok(dtoOut);
         }

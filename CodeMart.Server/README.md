@@ -130,6 +130,7 @@ We leverage **Supabase** for fully managed PostgreSQL hosting.
 - **Connection String**: `Host=db.[project-ref].supabase.co;Port=5432;Database=postgres;Username=postgres;Password=[password];SSL Mode=Require`
 - You can manage tables and rows directly from the Supabase Studio dashboard.
 
+
 ## 🤝 Contributing
 
 1. Fork the repository

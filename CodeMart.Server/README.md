@@ -28,7 +28,7 @@ CodeMart.Server handles all business logic, data persistence, and secure communi
 
 ## 🏗️ Architecture & Structure
 
-The repository follows a clean, service-oriented architecture:
+The repository follows service-oriented architecture:
 
 - **`Controllers/`**: API endpoints handling HTTP requests and routing.
 - **`Services/`**: Core business logic and service layer.
